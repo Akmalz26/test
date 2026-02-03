@@ -1,0 +1,929 @@
+import React, { useState, useEffect } from 'react';
+import { Head, useForm, Link } from '@inertiajs/react';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import { 
+  User, Home, BookOpen, Calendar, FileText, Upload, Phone, Mail,
+  Camera, GraduationCap, AlertCircle, CheckCircle, Info, X
+} from 'lucide-react';
+import FormSection from './Components/FormSection';
+import FormField from './Components/FormField';
+import UploadField from './Components/UploadField';
+
+export default function PpdbCreate({ auth, existingApplication = null }: { auth: any, existingApplication?: any }) {
+  const { data, setData, post, processing, errors, reset, progress } = useForm({
+    // Data Siswa
+    nama_lengkap: '',
+    tempat_lahir: '',
+    tanggal_lahir: '',
+    jenis_kelamin: '',
+    nik: '',
+    nisn: '',
+    agama: 'Islam',
+    email: '',
+    no_hp: '',
+    alamat: '',
+    rt: '',
+    rw: '',
+    kelurahan: '',
+    kecamatan: '',
+    kota: '',
+    provinsi: '',
+    kode_pos: '',
+    jurusan_1: '',
+    jurusan_2: '',
+    asal_sekolah: '',
+    tahun_lulus: new Date().getFullYear(),
+    
+    // Data Orang Tua
+    nama_ayah: '',
+    pekerjaan_ayah: '',
+    penghasilan_ayah: '',
+    pendidikan_ayah: '',
+    no_hp_ayah: '',
+    
+    nama_ibu: '',
+    pekerjaan_ibu: '',
+    penghasilan_ibu: '',
+    pendidikan_ibu: '',
+    no_hp_ibu: '',
+    
+    // Data Wali (opsional)
+    nama_wali: '',
+    pekerjaan_wali: '',
+    penghasilan_wali: '',
+    pendidikan_wali: '',
+    no_hp_wali: '',
+    hubungan_wali: '',
+    
+    // Dokumen
+    pas_foto: null as File | null,
+    kartu_keluarga: null as File | null,
+    akta_kelahiran: null as File | null,
+    ijazah: null as File | null,
+    rapor: null as File | null,
+  });
+  
+  const [currentStep, setCurrentStep] = useState(1);
+  const totalSteps = 4;
+  const [isFormLoaded, setIsFormLoaded] = useState(false);
+  const STORAGE_KEY = 'ppdb_form_draft';
+  const [showSuccess, setShowSuccess] = useState(false);
+  
+  // Load saved form data from localStorage
+  useEffect(() => {
+    try {
+      const savedData = localStorage.getItem(STORAGE_KEY);
+      if (savedData) {
+        const parsedData = JSON.parse(savedData);
+        
+        // Extract data without file objects (which can't be stored in localStorage)
+        const { pas_foto, kartu_keluarga, akta_kelahiran, ijazah, rapor, ...storedFormData } = parsedData;
+        
+        // Load saved step
+        if (parsedData.currentStep) {
+          setCurrentStep(parsedData.currentStep);
+        }
+        
+        // Merge saved data with initial state
+        setData(prevData => ({
+          ...prevData,
+          ...storedFormData
+        }));
+      }
+    } catch (error) {
+      console.error('Error loading form data:', error);
+    }
+    
+    setIsFormLoaded(true);
+  }, []);
+  
+  // Save form data to localStorage whenever it changes
+  useEffect(() => {
+    if (!isFormLoaded) return;
+    
+    try {
+      // Create a copy of the form data without file objects
+      const { pas_foto, kartu_keluarga, akta_kelahiran, ijazah, rapor, ...dataToStore } = data;
+      
+      // Add current step
+      const storageData = {
+        ...dataToStore,
+        currentStep
+      };
+      
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(storageData));
+    } catch (error) {
+      console.error('Error saving form data:', error);
+    }
+  }, [data, currentStep, isFormLoaded]);
+  
+  const nextStep = () => {
+    setCurrentStep(currentStep + 1);
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+  
+  const prevStep = () => {
+    setCurrentStep(currentStep - 1);
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+  
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    post('/ppdb/pendaftaran', {
+      onSuccess: () => {
+        // Hapus data draft setelah berhasil mengirim
+        localStorage.removeItem(STORAGE_KEY);
+        setShowSuccess(true);
+        // Scroll to top
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      }
+    });
+  };
+  
+  // Perbaikan untuk File Input errors
+  const handleFileChange = (field: 'pas_foto' | 'kartu_keluarga' | 'akta_kelahiran' | 'ijazah' | 'rapor', files: FileList | null) => {
+    if (files && files[0]) {
+      setData(field, files[0]);
+    }
+  };
+  
+  const stepTitles = [
+    'Data Siswa',
+    'Data Orang Tua',
+    'Pilihan Jurusan',
+    'Upload Dokumen'
+  ];
+  
+  // Opsi untuk dropdown
+  const options = {
+    agama: ['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Konghucu'],
+    gender: ['Laki-laki', 'Perempuan'],
+    jurusan: ['PPLG (Program Pengembangan Perangkat Lunak dan Gim)'],
+    pendidikan: ['SD/Sederajat', 'SMP/Sederajat', 'SMA/Sederajat', 'D1', 'D2', 'D3', 'D4/S1', 'S2', 'S3'],
+    pekerjaan: ['Tidak Bekerja', 'PNS', 'TNI/Polri', 'Karyawan Swasta', 'Wiraswasta', 'Buruh', 'Petani/Nelayan', 'Pensiunan', 'Lainnya'],
+    penghasilan: ['< Rp. 1.000.000', 'Rp. 1.000.000 - Rp. 3.000.000', 'Rp. 3.000.000 - Rp. 5.000.000', 'Rp. 5.000.000 - Rp. 10.000.000', '> Rp. 10.000.000']
+  };
+  
+  // Jika sudah ada aplikasi yang disubmit, redirect ke halaman status
+  if (existingApplication) {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <Navbar />
+        <div className="container mx-auto px-6 py-28">
+          <div className="max-w-2xl mx-auto bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10">
+            <div className="flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center">
+                <AlertCircle className="h-8 w-8 text-red-500" />
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold text-center mb-4">Anda Sudah Terdaftar</h2>
+            <p className="text-white/70 text-center mb-8">
+              Anda sudah memiliki pendaftaran aktif pada sistem kami. Silahkan cek status pendaftaran Anda.
+            </p>
+            <div className="flex justify-center">
+              <Link href="/ppdb/status" className="px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300">
+                Cek Status Pendaftaran
+              </Link>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+  
+  // Jika belum login, redirect ke halaman login
+  if (!auth.user) {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <Navbar />
+        <div className="container mx-auto px-6 py-28">
+          <div className="max-w-2xl mx-auto bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10">
+            <div className="flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center">
+                <Info className="h-8 w-8 text-orange-500" />
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold text-center mb-4">Login Diperlukan</h2>
+            <p className="text-white/70 text-center mb-8">
+              Untuk melakukan pendaftaran PPDB, Anda perlu login atau daftar akun terlebih dahulu.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Link href="/login" className="px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300 text-center">
+                Login
+              </Link>
+              <Link href="/register" className="px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white font-medium transition-all duration-300 text-center">
+                Daftar Akun
+              </Link>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+  
+  return (
+    <>
+      <Head title="Formulir Pendaftaran PPDB - SMK IT Baitul Aziz" />
+      
+      <div className="min-h-screen bg-black text-white">
+        <Navbar />
+        
+        <div className="container mx-auto px-6 py-20">
+          <div className="max-w-4xl mx-auto">
+            {/* Success Modal */}
+            {showSuccess && (
+              <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+                <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-8 max-w-md w-full">
+                  <div className="flex justify-end">
+                    <button 
+                      onClick={() => setShowSuccess(false)}
+                      className="p-1 hover:bg-white/10 rounded-full transition-colors"
+                      aria-label="Tutup notifikasi"
+                    >
+                      <X className="h-5 w-5 text-white/70" />
+                    </button>
+                  </div>
+                  <div className="flex items-center justify-center mb-6">
+                    <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center">
+                      <CheckCircle className="h-10 w-10 text-green-500" />
+                    </div>
+                  </div>
+                  <h2 className="text-2xl font-bold text-center mb-4">Pendaftaran Berhasil!</h2>
+                  <p className="text-white/70 text-center mb-8">
+                    Terima kasih telah melakukan pendaftaran. Data Anda akan kami proses. 
+                    Silahkan pantau status pendaftaran Anda secara berkala.
+                  </p>
+                  <div className="flex flex-col space-y-3">
+                    <Link href="/ppdb/status" className="w-full py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300 text-center">
+                      Lihat Status Pendaftaran
+                    </Link>
+                    <button 
+                      onClick={() => setShowSuccess(false)}
+                      className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-lg text-white font-medium transition-all duration-300"
+                    >
+                      Tutup
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Header */}
+            <div className="mb-10 text-center">
+              <h1 className="text-3xl font-bold text-white mb-4">
+                Formulir Pendaftaran <span className="text-orange-500">PPDB</span>
+              </h1>
+              <p className="text-white/70 max-w-xl mx-auto">
+                Silahkan isi formulir pendaftaran dengan data yang sesuai dan benar. Data yang Anda berikan akan digunakan untuk proses seleksi.
+              </p>
+            </div>
+            
+            {/* Progress */}
+            <div className="mb-8">
+              <div className="flex justify-between mb-2">
+                {stepTitles.map((title, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => index + 1 <= currentStep && setCurrentStep(index + 1)}
+                    className={`text-xs sm:text-sm font-medium ${
+                      index + 1 <= currentStep ? 'text-orange-500' : 'text-white/50'
+                    } ${index + 1 === currentStep ? 'font-bold' : ''}`}
+                    disabled={index + 1 > currentStep}
+                  >
+                    {index + 1}. {title}
+                  </button>
+                ))}
+              </div>
+              <div className="w-full bg-white/10 rounded-full h-2 mb-4">
+                <div 
+                  className="bg-orange-500 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+            
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden">
+              {/* Step 1: Data Siswa */}
+              {currentStep === 1 && (
+                <div>
+                  <FormSection
+                    title="Data Diri Siswa"
+                    description="Masukkan data diri calon siswa sesuai dengan dokumen resmi."
+                    icon={<User className="h-5 w-5" />}
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        label="Nama Lengkap"
+                        name="nama_lengkap"
+                        value={data.nama_lengkap}
+                        onChange={(e) => setData('nama_lengkap', e.target.value)}
+                        error={errors.nama_lengkap}
+                        required
+                      />
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          label="Tempat Lahir"
+                          name="tempat_lahir"
+                          value={data.tempat_lahir}
+                          onChange={(e) => setData('tempat_lahir', e.target.value)}
+                          error={errors.tempat_lahir}
+                          required
+                        />
+                        
+                        <FormField
+                          label="Tanggal Lahir"
+                          name="tanggal_lahir"
+                          type="date"
+                          value={data.tanggal_lahir}
+                          onChange={(e) => setData('tanggal_lahir', e.target.value)}
+                          error={errors.tanggal_lahir}
+                          required
+                        />
+                      </div>
+                      
+                      <FormField
+                        label="Jenis Kelamin"
+                        name="jenis_kelamin"
+                        type="select"
+                        value={data.jenis_kelamin}
+                        onChange={(e) => setData('jenis_kelamin', e.target.value)}
+                        error={errors.jenis_kelamin}
+                        options={options.gender}
+                        required
+                      />
+                      
+                      <FormField
+                        label="NIK"
+                        name="nik"
+                        value={data.nik}
+                        onChange={(e) => setData('nik', e.target.value)}
+                        error={errors.nik}
+                        required
+                      />
+                      
+                      <FormField
+                        label="NISN"
+                        name="nisn"
+                        value={data.nisn}
+                        onChange={(e) => setData('nisn', e.target.value)}
+                        error={errors.nisn}
+                        required
+                      />
+                      
+                      <FormField
+                        label="Agama"
+                        name="agama"
+                        type="select"
+                        value={data.agama}
+                        onChange={(e) => setData('agama', e.target.value)}
+                        error={errors.agama}
+                        options={options.agama}
+                        required
+                      />
+                    </div>
+                  </FormSection>
+                  
+                  <FormSection
+                    title="Kontak"
+                    description="Informasi kontak yang dapat dihubungi."
+                    icon={<Phone className="h-5 w-5" />}
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        label="Email"
+                        name="email"
+                        type="email"
+                        value={data.email}
+                        onChange={(e) => setData('email', e.target.value)}
+                        error={errors.email}
+                        required
+                      />
+                      
+                      <FormField
+                        label="Nomor HP"
+                        name="no_hp"
+                        value={data.no_hp}
+                        onChange={(e) => setData('no_hp', e.target.value)}
+                        error={errors.no_hp}
+                        required
+                      />
+                    </div>
+                  </FormSection>
+                  
+                  <FormSection
+                    title="Alamat"
+                    description="Alamat tempat tinggal sesuai KTP/Kartu Keluarga."
+                    icon={<Home className="h-5 w-5" />}
+                  >
+                    <div className="grid grid-cols-1 gap-6">
+                      <FormField
+                        label="Alamat Lengkap"
+                        name="alamat"
+                        type="textarea"
+                        value={data.alamat}
+                        onChange={(e) => setData('alamat', e.target.value)}
+                        error={errors.alamat}
+                        required
+                      />
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <FormField
+                          label="RT"
+                          name="rt"
+                          value={data.rt}
+                          onChange={(e) => setData('rt', e.target.value)}
+                          error={errors.rt}
+                          required
+                        />
+                        
+                        <FormField
+                          label="RW"
+                          name="rw"
+                          value={data.rw}
+                          onChange={(e) => setData('rw', e.target.value)}
+                          error={errors.rw}
+                          required
+                        />
+                        
+                        <FormField
+                          label="Kelurahan"
+                          name="kelurahan"
+                          value={data.kelurahan}
+                          onChange={(e) => setData('kelurahan', e.target.value)}
+                          error={errors.kelurahan}
+                          required
+                        />
+                        
+                        <FormField
+                          label="Kecamatan"
+                          name="kecamatan"
+                          value={data.kecamatan}
+                          onChange={(e) => setData('kecamatan', e.target.value)}
+                          error={errors.kecamatan}
+                          required
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <FormField
+                          label="Kota/Kabupaten"
+                          name="kota"
+                          value={data.kota}
+                          onChange={(e) => setData('kota', e.target.value)}
+                          error={errors.kota}
+                          required
+                        />
+                        
+                        <FormField
+                          label="Provinsi"
+                          name="provinsi"
+                          value={data.provinsi}
+                          onChange={(e) => setData('provinsi', e.target.value)}
+                          error={errors.provinsi}
+                          required
+                        />
+                        
+                        <FormField
+                          label="Kode Pos"
+                          name="kode_pos"
+                          value={data.kode_pos}
+                          onChange={(e) => setData('kode_pos', e.target.value)}
+                          error={errors.kode_pos}
+                          required
+                        />
+                      </div>
+                    </div>
+                  </FormSection>
+                </div>
+              )}
+              
+              {/* Step 2: Data Orang Tua */}
+              {currentStep === 2 && (
+                <div>
+                  <FormSection
+                    title="Data Ayah"
+                    description="Isi data ayah kandung sesuai dengan dokumen resmi."
+                    icon={<User className="h-5 w-5" />}
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        label="Nama Lengkap Ayah"
+                        name="nama_ayah"
+                        value={data.nama_ayah}
+                        onChange={(e) => setData('nama_ayah', e.target.value)}
+                        error={errors.nama_ayah}
+                        required
+                      />
+                      
+                      <FormField
+                        label="Nomor HP Ayah"
+                        name="no_hp_ayah"
+                        value={data.no_hp_ayah}
+                        onChange={(e) => setData('no_hp_ayah', e.target.value)}
+                        error={errors.no_hp_ayah}
+                        required
+                      />
+                      
+                      <FormField
+                        label="Pendidikan Terakhir"
+                        name="pendidikan_ayah"
+                        type="select"
+                        value={data.pendidikan_ayah}
+                        onChange={(e) => setData('pendidikan_ayah', e.target.value)}
+                        error={errors.pendidikan_ayah}
+                        options={options.pendidikan}
+                        required
+                      />
+                      
+                      <FormField
+                        label="Pekerjaan"
+                        name="pekerjaan_ayah"
+                        type="select"
+                        value={data.pekerjaan_ayah}
+                        onChange={(e) => setData('pekerjaan_ayah', e.target.value)}
+                        error={errors.pekerjaan_ayah}
+                        options={options.pekerjaan}
+                        required
+                      />
+                      
+                      <FormField
+                        label="Penghasilan per Bulan"
+                        name="penghasilan_ayah"
+                        type="select"
+                        value={data.penghasilan_ayah}
+                        onChange={(e) => setData('penghasilan_ayah', e.target.value)}
+                        error={errors.penghasilan_ayah}
+                        options={options.penghasilan}
+                        required
+                      />
+                    </div>
+                  </FormSection>
+                  
+                  <FormSection
+                    title="Data Ibu"
+                    description="Isi data ibu kandung sesuai dengan dokumen resmi."
+                    icon={<User className="h-5 w-5" />}
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        label="Nama Lengkap Ibu"
+                        name="nama_ibu"
+                        value={data.nama_ibu}
+                        onChange={(e) => setData('nama_ibu', e.target.value)}
+                        error={errors.nama_ibu}
+                        required
+                      />
+                      
+                      <FormField
+                        label="Nomor HP Ibu"
+                        name="no_hp_ibu"
+                        value={data.no_hp_ibu}
+                        onChange={(e) => setData('no_hp_ibu', e.target.value)}
+                        error={errors.no_hp_ibu}
+                        required
+                      />
+                      
+                      <FormField
+                        label="Pendidikan Terakhir"
+                        name="pendidikan_ibu"
+                        type="select"
+                        value={data.pendidikan_ibu}
+                        onChange={(e) => setData('pendidikan_ibu', e.target.value)}
+                        error={errors.pendidikan_ibu}
+                        options={options.pendidikan}
+                        required
+                      />
+                      
+                      <FormField
+                        label="Pekerjaan"
+                        name="pekerjaan_ibu"
+                        type="select"
+                        value={data.pekerjaan_ibu}
+                        onChange={(e) => setData('pekerjaan_ibu', e.target.value)}
+                        error={errors.pekerjaan_ibu}
+                        options={options.pekerjaan}
+                        required
+                      />
+                      
+                      <FormField
+                        label="Penghasilan per Bulan"
+                        name="penghasilan_ibu"
+                        type="select"
+                        value={data.penghasilan_ibu}
+                        onChange={(e) => setData('penghasilan_ibu', e.target.value)}
+                        error={errors.penghasilan_ibu}
+                        options={options.penghasilan}
+                        required
+                      />
+                    </div>
+                  </FormSection>
+                  
+                  <FormSection
+                    title="Data Wali (Opsional)"
+                    description="Isi jika calon siswa memiliki wali selain orang tua kandung."
+                    icon={<User className="h-5 w-5" />}
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        label="Nama Lengkap Wali"
+                        name="nama_wali"
+                        value={data.nama_wali}
+                        onChange={(e) => setData('nama_wali', e.target.value)}
+                        error={errors.nama_wali}
+                      />
+                      
+                      <FormField
+                        label="Hubungan dengan Siswa"
+                        name="hubungan_wali"
+                        type="select"
+                        value={data.hubungan_wali}
+                        onChange={(e) => setData('hubungan_wali', e.target.value)}
+                        error={errors.hubungan_wali}
+                        options={['Paman', 'Bibi', 'Kakek', 'Nenek', 'Kakak', 'Lainnya']}
+                      />
+                      
+                      <FormField
+                        label="Nomor HP Wali"
+                        name="no_hp_wali"
+                        value={data.no_hp_wali}
+                        onChange={(e) => setData('no_hp_wali', e.target.value)}
+                        error={errors.no_hp_wali}
+                      />
+                      
+                      <FormField
+                        label="Pendidikan Terakhir"
+                        name="pendidikan_wali"
+                        type="select"
+                        value={data.pendidikan_wali}
+                        onChange={(e) => setData('pendidikan_wali', e.target.value)}
+                        error={errors.pendidikan_wali}
+                        options={options.pendidikan}
+                      />
+                      
+                      <FormField
+                        label="Pekerjaan"
+                        name="pekerjaan_wali"
+                        type="select"
+                        value={data.pekerjaan_wali}
+                        onChange={(e) => setData('pekerjaan_wali', e.target.value)}
+                        error={errors.pekerjaan_wali}
+                        options={options.pekerjaan}
+                      />
+                      
+                      <FormField
+                        label="Penghasilan per Bulan"
+                        name="penghasilan_wali"
+                        type="select"
+                        value={data.penghasilan_wali}
+                        onChange={(e) => setData('penghasilan_wali', e.target.value)}
+                        error={errors.penghasilan_wali}
+                        options={options.penghasilan}
+                      />
+                    </div>
+                  </FormSection>
+                </div>
+              )}
+              
+              {/* Step 3: Pilihan Jurusan */}
+              {currentStep === 3 && (
+                <div>
+                  <FormSection
+                    title="Asal Sekolah"
+                    description="Informasi sekolah asal dan tahun kelulusan."
+                    icon={<Home className="h-5 w-5" />}
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        label="Asal Sekolah"
+                        name="asal_sekolah"
+                        value={data.asal_sekolah}
+                        onChange={(e) => setData('asal_sekolah', e.target.value)}
+                        error={errors.asal_sekolah}
+                        required
+                      />
+                      
+                      <FormField
+                        label="Tahun Lulus"
+                        name="tahun_lulus"
+                        type="number"
+                        value={data.tahun_lulus}
+                        onChange={(e) => setData('tahun_lulus', parseInt(e.target.value, 10) || new Date().getFullYear())}
+                        error={errors.tahun_lulus}
+                        required
+                      />
+                    </div>
+                  </FormSection>
+                  
+                  <FormSection
+                    title="Pilihan Jurusan"
+                    description="Pilih jurusan yang diminati. Anda dapat memilih 2 jurusan sebagai pilihan pertama dan kedua."
+                    icon={<GraduationCap className="h-5 w-5" />}
+                  >
+                    <div className="space-y-6">
+                      <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-4">
+                        <div className="flex items-start mb-3">
+                          <Info className="h-5 w-5 text-orange-500 mr-2 mt-0.5 flex-shrink-0" />
+                          <p className="text-sm text-white/70">
+                            Pilihlah jurusan yang sesuai dengan minat dan bakat Anda. Pilihan pertama akan diutamakan dalam proses seleksi.
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <FormField
+                        label="Pilihan Jurusan Pertama"
+                        name="jurusan_1"
+                        type="select"
+                        value={data.jurusan_1}
+                        onChange={(e) => setData('jurusan_1', e.target.value)}
+                        error={errors.jurusan_1}
+                        options={options.jurusan}
+                        required
+                      />
+                      
+                      <FormField
+                        label="Pilihan Jurusan Kedua"
+                        name="jurusan_2"
+                        type="select"
+                        value={data.jurusan_2}
+                        onChange={(e) => setData('jurusan_2', e.target.value)}
+                        error={errors.jurusan_2}
+                        options={options.jurusan}
+                        required
+                      />
+                    </div>
+                  </FormSection>
+                </div>
+              )}
+              
+              {/* Step 4: Upload Dokumen */}
+              {currentStep === 4 && (
+                <div>
+                  <FormSection
+                    title="Upload Dokumen"
+                    description="Upload dokumen pendukung dalam format JPG, PNG, atau PDF dengan ukuran maksimal 2MB per file."
+                    icon={<Upload className="h-5 w-5" />}
+                  >
+                    <div className="space-y-6">
+                      <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-4 mb-6">
+                        <div className="flex items-start mb-2">
+                          <Info className="h-5 w-5 text-orange-500 mr-2 mt-0.5 flex-shrink-0" />
+                          <p className="text-sm text-white/70">
+                            Dokumen yang diunggah harus jelas, tidak buram, dan merupakan dokumen asli (bukan fotokopi dari fotokopi).
+                          </p>
+                        </div>
+                        <ul className="text-sm text-white/70 ml-7 list-disc space-y-1">
+                          <li>Pastikan ukuran file tidak melebihi 2MB</li>
+                          <li>Format file yang diterima: JPG, PNG, dan PDF</li>
+                          <li>Hindari menggunakan nama file dengan karakter khusus</li>
+                        </ul>
+                      </div>
+                      
+                      <div>
+                        <UploadField
+                          label="Pas Foto (3x4)"
+                          name="pas_foto"
+                          accept="image/*"
+                          onChange={(e) => handleFileChange('pas_foto', e.target.files)}
+                          error={errors.pas_foto}
+                          progress={progress}
+                          required
+                        />
+                        <p className="mt-1 text-xs text-white/50 ml-1">
+                          Pas foto terbaru dengan latar belakang berwarna. Tipe file: PNG, JPG.
+                        </p>
+                      </div>
+                      
+                      <div>
+                        <UploadField
+                          label="Kartu Keluarga"
+                      <UploadField
+                        label="Pas Foto (3x4)"
+                        name="pas_foto"
+                        accept="image/*"
+                        onChange={(e) => handleFileChange('pas_foto', e.target.files)}
+                        error={errors.pas_foto}
+                        progress={progress}
+                        required
+                      />
+                      
+                      <UploadField
+                        label="Kartu Keluarga"
+                        name="kartu_keluarga"
+                        accept=".pdf,image/*"
+                        onChange={(e) => handleFileChange('kartu_keluarga', e.target.files)}
+                        error={errors.kartu_keluarga}
+                        progress={progress}
+                        required
+                      />
+                      
+                      <UploadField
+                        label="Akta Kelahiran"
+                        name="akta_kelahiran"
+                        accept=".pdf,image/*"
+                        onChange={(e) => handleFileChange('akta_kelahiran', e.target.files)}
+                        error={errors.akta_kelahiran}
+                        progress={progress}
+                        required
+                      />
+                      
+                      <UploadField
+                        label="Ijazah/Surat Keterangan Lulus"
+                        name="ijazah"
+                        accept=".pdf,image/*"
+                        onChange={(e) => handleFileChange('ijazah', e.target.files)}
+                        error={errors.ijazah}
+                        progress={progress}
+                        required
+                      />
+                      
+                      <UploadField
+                        label="Rapor Terakhir"
+                        name="rapor"
+                        accept=".pdf,image/*"
+                        onChange={(e) => handleFileChange('rapor', e.target.files)}
+                        error={errors.rapor}
+                        progress={progress}
+                        required
+                      />
+                      
+                      <div className="bg-white/5 border border-white/10 rounded-lg p-5 mt-6">
+                        <div className="flex items-center mb-4">
+                          <CheckCircle className="h-5 w-5 text-orange-500 mr-2" />
+                          <h3 className="font-medium text-white">Pernyataan</h3>
+                        </div>
+                        <p className="text-sm text-white/70 mb-4">
+                          Dengan mengisi formulir ini, saya menyatakan bahwa semua informasi yang saya berikan adalah benar dan dapat dipertanggungjawabkan. Saya bersedia menerima konsekuensi jika terdapat ketidakbenaran dari informasi yang saya berikan.
+                        </p>
+                        <div className="flex items-center">
+                          <input 
+                            type="checkbox" 
+                            id="agreement" 
+                            className="w-4 h-4 rounded border-white/30 bg-white/5 text-orange-500 focus:ring-orange-500"
+                            required
+                          />
+                          <label htmlFor="agreement" className="ml-2 text-sm font-medium text-white">
+                            Saya menyetujui pernyataan ini
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </FormSection>
+                </div>
+              )}
+              
+              {/* Navigation */}
+              <div className="bg-white/5 backdrop-blur-sm px-6 py-4 flex items-center justify-between border-t border-white/10">
+                {currentStep > 1 ? (
+                  <button
+                    type="button"
+                    onClick={prevStep}
+                    className="px-5 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white font-medium transition-all duration-300"
+                  >
+                    Sebelumnya
+                  </button>
+                ) : (
+                  <div></div>
+                )}
+                
+                {currentStep < totalSteps ? (
+                  <button
+                    type="button"
+                    onClick={nextStep}
+                    className="px-5 py-2 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300"
+                  >
+                    Selanjutnya
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={processing}
+                    className="px-5 py-2 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    {processing ? 'Memproses...' : 'Kirim Pendaftaran'}
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
+        </div>
+        
+        <Footer />
+      </div>
+    </>
+  );
+} 
