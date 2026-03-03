@@ -1,362 +1,319 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Menu, X, Home, Settings, Users, FileText,
+  LogOut, ChevronRight, LayoutDashboard,
+  Bell, Search, User, Image, Newspaper,
+  Activity, GraduationCap, ClipboardList
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-}
+type Props = {
+  children: React.ReactNode;
+};
 
-interface PageProps {
-  auth: {
-    user: User
-  };
-  [key: string]: any;
-}
+export default function AdminLayout({ children }: Props) {
+  const { props, url } = usePage<any>();
+  const { auth } = props;
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
-const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { auth } = usePage<PageProps>().props;
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  // Initialize sidebar state once on mount
+  useEffect(() => {
+    const isDesktop = window.innerWidth >= 768;
+    const savedState = localStorage.getItem('adminSidebarOpen');
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
+    if (savedState !== null) {
+      setSidebarOpen(savedState === 'true');
+    } else {
+      setSidebarOpen(isDesktop);
+    }
+  }, []); // Run only once on mount
 
-  const closeSidebar = () => {
-    setSidebarOpen(false);
-  };
+  // Save sidebar state to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('adminSidebarOpen', String(sidebarOpen));
+  }, [sidebarOpen]);
 
-  // Routing aktif
-  const isActive = (path: string) => {
-    return window.location.pathname.startsWith(path);
-  };
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  const isExactActive = (path: string) => {
-    return window.location.pathname === path;
-  };
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [url]);
 
-  // Get current page name for breadcrumb
-  const getPageName = () => {
-    const path = window.location.pathname;
-    if (path.includes('/dashboard')) return 'Dashboard';
-    if (path.includes('/ppdb/settings')) return 'Pengaturan PPDB';
-    if (path.includes('/ppdb/dashboard')) return 'Dashboard PPDB';
-    if (path.includes('/ppdb')) return 'PPDB';
-    if (path.includes('/users')) return 'Pengguna';
-    if (path.includes('/gallery')) return 'Galeri';
-    if (path.includes('/news')) return 'Berita';
-    if (path.includes('/teachers')) return 'Guru';
-    if (path.includes('/extracurriculars')) return 'Ekstrakurikuler';
-    return 'Dashboard';
+  const navItems = [
+    {
+      title: 'Dashboard',
+      href: '/admin/dashboard',
+      icon: LayoutDashboard,
+      active: url === '/admin/dashboard'
+    },
+    {
+      title: 'SPMB',
+      href: '/admin/spmb',
+      icon: ClipboardList,
+      active: url.startsWith('/admin/spmb') && !url.includes('settings')
+    },
+    {
+      title: 'Berita',
+      href: '/admin/news',
+      icon: Newspaper,
+      active: url.startsWith('/admin/news')
+    },
+    {
+      title: 'Galeri',
+      href: '/admin/gallery',
+      icon: Image,
+      active: url.startsWith('/admin/gallery')
+    },
+    {
+      title: 'Ekstrakurikuler',
+      href: '/admin/extracurriculars',
+      icon: Activity,
+      active: url.startsWith('/admin/extracurriculars')
+    },
+    {
+      title: 'Guru / Staff',
+      href: '/admin/teachers',
+      icon: GraduationCap,
+      active: url.startsWith('/admin/teachers')
+    },
+    {
+      title: 'Pengguna',
+      href: '/admin/users',
+      icon: Users,
+      active: url.startsWith('/admin/users')
+    },
+    {
+      title: 'Pengaturan SPMB',
+      href: '/admin/spmb/settings',
+      icon: Settings,
+      active: url.startsWith('/admin/spmb/settings')
+    },
+  ];
+
+  const sidebarVariants = {
+    open: { width: '280px', transition: { type: 'spring', damping: 20 } },
+    closed: { width: '80px', transition: { type: 'spring', damping: 20 } }
   };
 
   return (
-    <div className="m-0 font-sans text-base antialiased font-normal leading-default bg-gray-50 text-slate-500 min-h-screen">
-      {/* Background gradient - extended for better coverage */}
-      <div className="absolute w-full bg-gradient-to-br from-orange-500 to-orange-600 min-h-80"></div>
+    <div className="min-h-screen flex relative overflow-hidden">
+      {/* Background Mesh is handled in global CSS, but we can add overlay if needed */}
 
-      {/* Mobile sidebar backdrop */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-gray-900/50 backdrop-blur-sm xl:hidden transition-opacity duration-300"
-          onClick={closeSidebar}
-        ></div>
-      )}
-
-      {/* Sidebar */}
-      <aside
-        className={`fixed inset-y-0 flex-wrap items-center justify-between block w-full p-0 my-4 overflow-y-auto antialiased transition-all duration-300 bg-white border-0 shadow-2xl max-w-64 z-50 rounded-2xl ${sidebarOpen
-            ? 'translate-x-0 ml-4'
-            : '-translate-x-full xl:translate-x-0 xl:ml-6 xl:left-0'
-          }`}
+      {/* Sidebar - Desktop */}
+      <motion.aside
+        initial={false}
+        animate={sidebarOpen ? 'open' : 'closed'}
+        variants={sidebarVariants}
+        className={cn(
+          "fixed left-4 top-4 bottom-4 z-40 hidden md:flex flex-col",
+          "bg-white/40 backdrop-blur-xl border border-white/20 shadow-xl rounded-2xl",
+          "overflow-hidden transition-all duration-300"
+        )}
       >
-        {/* Logo */}
-        <div className="h-19">
-          <i
-            className="absolute top-0 right-0 p-4 opacity-50 cursor-pointer fas fa-times text-slate-400 xl:hidden"
-            onClick={closeSidebar}
-          ></i>
-          <Link
-            href="/admin/dashboard"
-            className="block px-8 py-6 m-0 text-sm whitespace-nowrap text-slate-700"
-          >
-            <img
-              src="/assets/images/logo.png"
-              className="inline h-full max-w-full transition-all duration-200 ease-nav-brand max-h-8"
-              alt="SMK IT Baitul Aziz"
-            />
-            <span className="ml-1 font-semibold transition-all duration-200 ease-nav-brand">
-              SMK IT Admin
-            </span>
+        {/* Logo Area */}
+        <div className="h-20 flex items-center justify-center border-b border-white/10 relative">
+          <Link href="/" className="flex items-center space-x-2 px-4">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-orange-400 to-orange-600 flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform">
+              <span className="text-white font-bold text-xl">S</span>
+            </div>
+            <AnimatePresence>
+              {sidebarOpen && (
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  className="flex flex-col"
+                >
+                  <span className="font-bold text-gray-800 text-lg leading-tight">Admin</span>
+                  <span className="text-xs text-orange-600 font-medium tracking-wider">PANEL</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </Link>
+
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="absolute top-1/2 -right-3 transform -translate-y-1/2 w-6 h-6 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-lg text-gray-500 hover:text-orange-500 hover:scale-110 transition-all z-50 md:flex hidden"
+          >
+            <ChevronRight className={cn("w-3 h-3 transition-transform", sidebarOpen ? "rotate-180" : "0")} />
+          </button>
         </div>
 
-        <hr className="h-px mt-0 bg-transparent bg-gradient-to-r from-transparent via-black/40 to-transparent" />
+        {/* Nav Items */}
+        <div className="flex-1 overflow-y-auto py-6 px-3 space-y-2 custom-scrollbar">
+          {navItems.map((item, idx) => (
+            <Link
+              key={idx}
+              href={item.href}
+              className={cn(
+                "group flex items-center px-3 py-3 rounded-xl transition-all duration-200 relative overflow-hidden",
+                item.active
+                  ? "text-orange-600 font-medium shadow-md bg-white/60"
+                  : "text-gray-600 hover:text-orange-600 hover:bg-white/40"
+              )}
+            >
+              {item.active && (
+                <motion.div
+                  layoutId="activeTab"
+                  className="absolute left-0 top-0 bottom-0 w-1 bg-orange-500 rounded-r-full"
+                />
+              )}
+              <item.icon className={cn("w-6 h-6 flex-shrink-0 transition-colors", item.active ? "text-orange-600" : "text-gray-400 group-hover:text-orange-500")} />
 
-        {/* Navigation */}
-        <div className="items-center block w-auto max-h-screen overflow-auto h-sidenav grow basis-full">
-          <ul className="flex flex-col pl-0 mb-0">
-            {/* Dashboard */}
-            <li className="mt-0.5 w-full">
-              <Link
-                href="/admin/dashboard"
-                className={`py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors ${isExactActive('/admin/dashboard')
-                  ? 'bg-orange-500/13 font-semibold text-slate-700 rounded-lg'
-                  : 'text-slate-500 hover:text-slate-700'
-                  }`}
-              >
-                <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
-                  <i className={`relative top-0 text-sm leading-normal ni ni-tv-2 ${isExactActive('/admin/dashboard') ? 'text-orange-500' : 'text-slate-400'}`}></i>
+              <AnimatePresence>
+                {sidebarOpen && (
+                  <motion.span
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    className="ml-3 whitespace-nowrap"
+                  >
+                    {item.title}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+
+              {!sidebarOpen && (
+                <div className="absolute left-14 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-nowrap">
+                  {item.title}
                 </div>
-                <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">Dashboard</span>
-              </Link>
-            </li>
+              )}
+            </Link>
+          ))}
+        </div>
 
-            {/* PPDB */}
-            <li className="mt-0.5 w-full">
-              <Link
-                href="/admin/ppdb"
-                className={`py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors ${isActive('/admin/ppdb')
-                  ? 'bg-orange-500/13 font-semibold text-slate-700 rounded-lg'
-                  : 'text-slate-500 hover:text-slate-700'
-                  }`}
-              >
-                <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
-                  <i className={`relative top-0 text-sm leading-normal ni ni-single-copy-04 ${isActive('/admin/ppdb') ? 'text-orange-500' : 'text-slate-400'}`}></i>
-                </div>
-                <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">PPDB</span>
-              </Link>
-            </li>
-
-            {/* PPDB Submenu */}
-            {isActive('/admin/ppdb') && (
-              <li className="w-full">
-                <ul className="ml-10 space-y-1">
-                  <li>
-                    <Link
-                      href="/admin/ppdb/dashboard"
-                      className={`py-1.5 text-xs my-0 flex items-center whitespace-nowrap px-4 transition-colors ${isActive('/admin/ppdb/dashboard') ? 'text-orange-500 font-semibold' : 'text-slate-500 hover:text-slate-700'
-                        }`}
-                    >
-                      <i className="mr-2 fas fa-chart-pie text-xs"></i>
-                      Dashboard PPDB
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/admin/ppdb"
-                      className={`py-1.5 text-xs my-0 flex items-center whitespace-nowrap px-4 transition-colors ${isExactActive('/admin/ppdb') ? 'text-orange-500 font-semibold' : 'text-slate-500 hover:text-slate-700'
-                        }`}
-                    >
-                      <i className="mr-2 fas fa-users text-xs"></i>
-                      Daftar Pendaftar
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/admin/ppdb/settings"
-                      className={`py-1.5 text-xs my-0 flex items-center whitespace-nowrap px-4 transition-colors ${isActive('/admin/ppdb/settings') ? 'text-orange-500 font-semibold' : 'text-slate-500 hover:text-slate-700'
-                        }`}
-                    >
-                      <i className="mr-2 fas fa-cog text-xs"></i>
-                      Pengaturan PPDB
-                    </Link>
-                  </li>
-                </ul>
-              </li>
+        {/* Footer / User Profile */}
+        <div className="p-4 border-t border-white/10">
+          <div className={cn(
+            "flex items-center p-2 rounded-xl bg-orange-50/50 border border-orange-100 transition-all cursor-pointer hover:bg-orange-100/50",
+            sidebarOpen ? "justify-start" : "justify-center"
+          )}>
+            <div className="w-8 h-8 rounded-full bg-orange-200 flex items-center justify-center text-orange-700 font-bold text-sm">
+              {auth.user?.name?.[0] || 'A'}
+            </div>
+            {sidebarOpen && (
+              <div className="ml-3 overflow-hidden">
+                <p className="text-sm font-semibold text-gray-700 truncate">{auth.user?.name}</p>
+                <p className="text-xs text-gray-500 truncate">{auth.user?.email}</p>
+              </div>
             )}
-
-            {/* Gallery */}
-            <li className="mt-0.5 w-full">
-              <Link
-                href="/admin/gallery"
-                className={`py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors ${isActive('/admin/gallery')
-                  ? 'bg-orange-500/13 font-semibold text-slate-700 rounded-lg'
-                  : 'text-slate-500 hover:text-slate-700'
-                  }`}
-              >
-                <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
-                  <i className={`relative top-0 text-sm leading-normal ni ni-image ${isActive('/admin/gallery') ? 'text-emerald-500' : 'text-slate-400'}`}></i>
-                </div>
-                <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">Galeri</span>
+            {sidebarOpen && (
+              <Link href="/logout" method="post" as="button" className="ml-auto text-gray-400 hover:text-red-500 transition-colors">
+                <LogOut className="w-4 h-4" />
               </Link>
-            </li>
-
-            {/* News */}
-            <li className="mt-0.5 w-full">
-              <Link
-                href="/admin/news"
-                className={`py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors ${isActive('/admin/news')
-                  ? 'bg-orange-500/13 font-semibold text-slate-700 rounded-lg'
-                  : 'text-slate-500 hover:text-slate-700'
-                  }`}
-              >
-                <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
-                  <i className={`relative top-0 text-sm leading-normal ni ni-paper-diploma ${isActive('/admin/news') ? 'text-cyan-500' : 'text-slate-400'}`}></i>
-                </div>
-                <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">Berita</span>
-              </Link>
-            </li>
-
-            {/* Extracurriculars */}
-            <li className="mt-0.5 w-full">
-              <Link
-                href="/admin/extracurriculars"
-                className={`py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors ${isActive('/admin/extracurriculars')
-                  ? 'bg-orange-500/13 font-semibold text-slate-700 rounded-lg'
-                  : 'text-slate-500 hover:text-slate-700'
-                  }`}
-              >
-                <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
-                  <i className={`relative top-0 text-sm leading-normal ni ni-trophy ${isActive('/admin/extracurriculars') ? 'text-red-500' : 'text-slate-400'}`}></i>
-                </div>
-                <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">Ekstrakurikuler</span>
-              </Link>
-            </li>
-
-            {/* Divider */}
-            <li className="w-full mt-4">
-              <h6 className="pl-6 ml-2 text-xs font-bold leading-tight uppercase opacity-60">
-                Manajemen
-              </h6>
-            </li>
-
-            {/* Users */}
-            <li className="mt-0.5 w-full">
-              <Link
-                href="/admin/users"
-                className={`py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors ${isActive('/admin/users')
-                  ? 'bg-orange-500/13 font-semibold text-slate-700 rounded-lg'
-                  : 'text-slate-500 hover:text-slate-700'
-                  }`}
-              >
-                <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
-                  <i className={`relative top-0 text-sm leading-normal ni ni-single-02 ${isActive('/admin/users') ? 'text-slate-700' : 'text-slate-400'}`}></i>
-                </div>
-                <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">Pengguna</span>
-              </Link>
-            </li>
-
-            {/* Teachers */}
-            <li className="mt-0.5 w-full">
-              <Link
-                href="/admin/teachers"
-                className={`py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors ${isActive('/admin/teachers')
-                  ? 'bg-orange-500/13 font-semibold text-slate-700 rounded-lg'
-                  : 'text-slate-500 hover:text-slate-700'
-                  }`}
-              >
-                <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
-                  <i className={`relative top-0 text-sm leading-normal ni ni-hat-3 ${isActive('/admin/teachers') ? 'text-blue-500' : 'text-slate-400'}`}></i>
-                </div>
-                <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">Guru</span>
-              </Link>
-            </li>
-          </ul>
+            )}
+          </div>
         </div>
-      </aside>
+      </motion.aside>
 
-      {/* Main Content */}
-      <main className="relative h-full max-h-screen transition-all duration-200 ease-in-out xl:ml-68 rounded-xl">
-        {/* Navbar */}
-        <nav className="relative flex flex-wrap items-center justify-between px-0 py-2 mx-6 transition-all ease-in shadow-none duration-250 rounded-2xl lg:flex-nowrap lg:justify-start">
-          <div className="flex items-center justify-between w-full px-4 py-1 mx-auto flex-wrap-inherit">
-            <nav>
-              {/* Breadcrumb */}
-              <ol className="flex flex-wrap pt-1 mr-12 bg-transparent rounded-lg sm:mr-16">
-                <li className="text-sm leading-normal">
-                  <a className="text-white opacity-50" href="#">Admin</a>
-                </li>
-                <li className="text-sm pl-2 capitalize leading-normal text-white before:float-left before:pr-2 before:text-white before:content-['/']">
-                  {getPageName()}
-                </li>
-              </ol>
-              <h6 className="mb-0 font-bold text-white capitalize">{getPageName()}</h6>
-            </nav>
-
-            <div className="flex items-center mt-2 grow sm:mt-0 sm:mr-6 md:mr-0 lg:flex lg:basis-auto">
-              <ul className="flex flex-row justify-end pl-0 mb-0 list-none md-max:w-full ml-auto">
-                {/* Mobile menu button */}
-                <li className="flex items-center xl:hidden">
-                  <button
-                    onClick={toggleSidebar}
-                    className="block p-0 text-sm text-white transition-all ease-nav-brand"
+      {/* Mobile Drawer */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileOpen(false)}
+              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden"
+            />
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              className="fixed inset-y-0 left-0 w-64 bg-white/80 backdrop-blur-xl z-50 p-4 shadow-2xl md:hidden"
+            >
+              <div className="flex justify-between items-center mb-8">
+                <span className="font-bold text-xl text-gray-800">Menu</span>
+                <button onClick={() => setMobileOpen(false)} className="p-2 bg-gray-100 rounded-full">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="space-y-2">
+                {navItems.map((item, idx) => (
+                  <Link
+                    key={idx}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    className={cn(
+                      "flex items-center px-4 py-3 rounded-xl transition-all",
+                      item.active
+                        ? "bg-orange-50 text-orange-600 font-medium"
+                        : "text-gray-600 hover:bg-gray-50"
+                    )}
                   >
-                    <div className="w-4.5 overflow-hidden">
-                      <i className="ease mb-0.75 relative block h-0.5 rounded-sm bg-white transition-all"></i>
-                      <i className="ease mb-0.75 relative block h-0.5 rounded-sm bg-white transition-all"></i>
-                      <i className="ease relative block h-0.5 rounded-sm bg-white transition-all"></i>
-                    </div>
-                  </button>
-                </li>
+                    <item.icon className="w-5 h-5 mr-3" />
+                    {item.title}
+                  </Link>
+                ))}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
-                {/* User dropdown */}
-                <li className="relative flex items-center px-4">
-                  <button
-                    onClick={() => setDropdownOpen(!dropdownOpen)}
-                    className="flex items-center p-0 text-sm text-white transition-all ease-nav-brand"
-                  >
-                    <i className="fa fa-user mr-2"></i>
-                    <span className="hidden sm:inline">{auth.user.name}</span>
-                    <i className="fa fa-chevron-down ml-2 text-xs"></i>
-                  </button>
+      {/* Main Content Area */}
+      <main
+        className={cn(
+          "flex-1 flex flex-col min-h-screen transition-all duration-300",
+          sidebarOpen ? "md:ml-[300px]" : "md:ml-[100px]"
+        )}
+      >
+        {/* Header */}
+        <header
+          className={cn(
+            "sticky top-0 z-30 px-6 py-4 transition-all duration-300",
+            scrolled ? "bg-white/60 backdrop-blur-md shadow-sm" : "bg-transparent"
+          )}
+        >
+          <div className="flex justify-between items-center max-w-7xl mx-auto md:mx-0">
+            <div className="flex items-center md:hidden">
+              <button
+                onClick={() => setMobileOpen(true)}
+                className="p-2 bg-white/50 backdrop-blur-md rounded-xl border border-white/20 shadow-sm"
+              >
+                <Menu className="w-6 h-6 text-gray-600" />
+              </button>
+            </div>
 
-                  {dropdownOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
-                      <Link
-                        href="/"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        <i className="fa fa-home mr-2"></i>
-                        Ke Website
-                      </Link>
-                      <Link
-                        href="/profile/edit"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        <i className="fa fa-user-cog mr-2"></i>
-                        Profil
-                      </Link>
-                      <hr className="my-1" />
-                      <Link
-                        href="/logout"
-                        method="post"
-                        as="button"
-                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                      >
-                        <i className="fa fa-sign-out-alt mr-2"></i>
-                        Logout
-                      </Link>
-                    </div>
-                  )}
-                </li>
-              </ul>
+            <div className="flex-1 md:flex hidden items-center bg-white/40 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 hover:bg-white/60 transition-colors w-full max-w-md ml-4 shadow-sm">
+              <Search className="w-4 h-4 text-gray-400 mr-2" />
+              <input
+                type="text"
+                placeholder="Cari sesuatu..."
+                className="bg-transparent border-none outline-none text-sm w-full placeholder-gray-400 focus:ring-0"
+              />
+            </div>
+
+            <div className="flex items-center space-x-4">
+              <button className="relative p-2 bg-white/40 backdrop-blur-md rounded-xl hover:bg-white/60 transition-colors border border-white/20 shadow-sm">
+                <Bell className="w-5 h-5 text-gray-600" />
+                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+              </button>
             </div>
           </div>
-        </nav>
+        </header>
 
         {/* Page Content */}
-        <div className="w-full px-6 py-6 mx-auto">
-          {children}
+        <div className="p-4 md:p-6 lg:p-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            {children}
+          </motion.div>
         </div>
-
-        {/* Footer */}
-        <footer className="pt-4">
-          <div className="w-full px-6 mx-auto">
-            <div className="flex flex-wrap items-center -mx-3 lg:justify-between">
-              <div className="w-full max-w-full px-3 mt-0 mb-6 shrink-0 lg:mb-0 lg:w-1/2 lg:flex-none">
-                <div className="text-sm leading-normal text-center text-slate-500 lg:text-left">
-                  © {new Date().getFullYear()}, SMK IT Baitul Aziz
-                </div>
-              </div>
-            </div>
-          </div>
-        </footer>
       </main>
     </div>
   );
-};
-
-export default AdminLayout;
+}

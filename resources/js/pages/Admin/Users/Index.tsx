@@ -85,10 +85,10 @@ export default function UsersIndex({
       <div className="px-6 py-8">
         <div className="mb-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white">
+            <h1 className="text-2xl font-bold text-gray-800">
               Kelola Pengguna
             </h1>
-            <p className="mt-1 text-white">
+            <p className="mt-1 text-gray-600">
               Kelola akun pengguna dan administrator sistem.
             </p>
           </div>

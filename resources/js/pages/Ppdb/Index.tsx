@@ -11,14 +11,40 @@ interface PpdbSettings {
   closeDate: string | null;
   academicYear: string | null;
   messageClosed: string | null;
+  brochure?: {
+    file: string;
+    title: string | null;
+    description: string | null;
+    extension: string;
+  } | null;
+}
+
+interface TimelineItem {
+  id: number;
+  title: string;
+  date: string;
+  description: string;
+  icon: string;
+}
+
+interface InfoCardItem {
+  id: number;
+  title: string;
+  icon: string;
+  content: string;
+  order: number;
+  is_active: boolean;
+  card_type: string;
 }
 
 interface PpdbIndexProps {
   hasRegistered?: boolean;
   ppdbSettings?: PpdbSettings | null;
+  timelines?: TimelineItem[];
+  infoCards?: InfoCardItem[];
 }
 
-export default function PpdbIndex({ hasRegistered = false, ppdbSettings }: PpdbIndexProps) {
+export default function PpdbIndex({ hasRegistered = false, ppdbSettings, timelines = [], infoCards = [] }: PpdbIndexProps) {
   const heroRef = useRef(null);
   const isHeroInView = useInView(heroRef, { once: true });
 
@@ -36,36 +62,34 @@ export default function PpdbIndex({ hasRegistered = false, ppdbSettings }: PpdbI
     return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
   };
 
-  const timeline = [
-    {
-      title: 'Pendaftaran Tahap 1',
-      date: 'Februari - April 2025',
-      description: 'Pendaftaran dapat dilakukan secara online melalui website resmi SMK IT Baitul Aziz',
-      icon: <FileText className="h-6 w-6" />
-    },
-    {
-      title: 'Pendaftaran Tahap 2',
-      date: 'Mei - Juli 2025',
-      description: 'Pendaftaran tahap kedua untuk calon peserta didik baru SMK IT Baitul Aziz',
-      icon: <CheckCircle className="h-6 w-6" />
-    },
-    {
-      title: 'Pengumuman Hasil',
-      date: '10 Juni 2025',
-      description: 'Pengumuman hasil seleksi PPDB melalui website dan Whatsapp',
-      icon: <CalendarCheck className="h-6 w-6" />
-    },
-    {
-      title: 'Daftar Ulang',
-      date: 'Juni - Juli 2025',
-      description: 'Proses daftar ulang bagi calon peserta didik yang diterima',
-      icon: <Clock className="h-6 w-6" />
+  const getIcon = (iconName: string) => {
+    const iconProps = { className: "h-6 w-6" };
+    switch (iconName) {
+      case 'file-text': return <FileText {...iconProps} />;
+      case 'check-circle': return <CheckCircle {...iconProps} />;
+      case 'calendar-check': return <CalendarCheck {...iconProps} />;
+      case 'clock': return <Clock {...iconProps} />;
+      case 'users': return <Users {...iconProps} />;
+      case 'school': return <School {...iconProps} />;
+      default: return <CheckCircle {...iconProps} />;
     }
-  ];
+  };
+
+  const getIconForCard = (iconName: string) => {
+    const iconProps = { className: "h-6 w-6" };
+    switch (iconName) {
+      case 'file-text': return <FileText {...iconProps} />;
+      case 'school': return <School {...iconProps} />;
+      case 'award': return <Medal {...iconProps} />;
+      case 'book-open': return <BookOpen {...iconProps} />;
+      case 'briefcase': return <Briefcase {...iconProps} />;
+      default: return <FileText {...iconProps} />;
+    }
+  };
 
   return (
     <>
-      <Head title="PPDB SMK IT Baitul Aziz" />
+      <Head title="SPMB SMK IT Baitul Aziz" />
 
       <div className="min-h-screen bg-white text-gray-800">
         <Navbar />
@@ -111,9 +135,9 @@ export default function PpdbIndex({ hasRegistered = false, ppdbSettings }: PpdbI
                       <XCircle className="w-6 h-6 text-red-500" />
                     </div>
                     <div className="text-left">
-                      <h3 className="font-semibold text-red-800 mb-2">Pendaftaran PPDB Ditutup</h3>
+                      <h3 className="font-semibold text-red-800 mb-2">Pendaftaran SPMB Ditutup</h3>
                       <p className="text-red-700 text-sm">
-                        {ppdbSettings?.messageClosed || 'Pendaftaran PPDB saat ini sedang ditutup. Silakan hubungi pihak sekolah untuk informasi lebih lanjut.'}
+                        {ppdbSettings?.messageClosed || 'Pendaftaran SPMB saat ini sedang ditutup. Silakan hubungi pihak sekolah untuk informasi lebih lanjut.'}
                       </p>
                       {(ppdbSettings?.openDate || ppdbSettings?.closeDate) && (
                         <div className="mt-3 text-xs text-red-600">
@@ -130,14 +154,14 @@ export default function PpdbIndex({ hasRegistered = false, ppdbSettings }: PpdbI
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 {hasRegistered ? (
                   <Link
-                    href="/ppdb/status"
+                    href="/spmb/status"
                     className="px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300 w-full sm:w-auto text-center"
                   >
                     Cek Status Pendaftaran
                   </Link>
                 ) : isOpen ? (
                   <Link
-                    href="/ppdb/pendaftaran"
+                    href="/spmb/pendaftaran"
                     className="px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300 w-full sm:w-auto text-center"
                   >
                     Daftar Sekarang
@@ -162,7 +186,7 @@ export default function PpdbIndex({ hasRegistered = false, ppdbSettings }: PpdbI
           <div className="container mx-auto px-6 relative">
             <div className="max-w-3xl mx-auto text-center mb-16">
               <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                Informasi <span className="text-orange-500">PPDB</span>
+                Informasi <span className="text-orange-500">SPMB</span>
               </h2>
               <p className="text-gray-600">
                 Berikut adalah informasi penting terkait Penerimaan Peserta Didik Baru SMK IT Baitul Aziz tahun ajaran 2025/2026
@@ -170,146 +194,133 @@ export default function PpdbIndex({ hasRegistered = false, ppdbSettings }: PpdbI
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={isInfoInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:border-orange-200 hover:shadow-md transition-all group"
-              >
-                <div className="w-12 h-12 rounded-lg bg-orange-100 flex items-center justify-center mb-4 group-hover:bg-orange-200 transition-all">
-                  <FileText className="text-orange-500 h-6 w-6" />
+              {infoCards.length > 0 ? (
+                infoCards.map((card, index) => (
+                  <motion.div
+                    key={card.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={isInfoInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.5, delay: 0.1 * (index + 1) }}
+                    className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:border-orange-200 hover:shadow-md transition-all group"
+                  >
+                    <div className="w-12 h-12 rounded-lg bg-orange-100 flex items-center justify-center mb-4 group-hover:bg-orange-200 transition-all">
+                      <div className="text-orange-500">{getIconForCard(card.icon)}</div>
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-800 mb-3">{card.title}</h3>
+                    <div
+                      className="text-gray-600 prose prose-sm max-w-none
+                        [&>ul]:space-y-2 
+                        [&>ul]:list-none
+                        [&>ul>li]:flex
+                        [&>ul>li]:items-start
+                        [&>ul>li]:before:content-[''] 
+                        [&>ul>li]:before:inline-block 
+                        [&>ul>li]:before:w-1.5 
+                        [&>ul>li]:before:h-1.5 
+                        [&>ul>li]:before:rounded-full 
+                        [&>ul>li]:before:bg-orange-500 
+                        [&>ul>li]:before:mt-1.5 
+                        [&>ul>li]:before:mr-2
+                        [&>h4]:font-medium
+                        [&>h4]:text-gray-800
+                        [&>h4]:mb-2
+                        [&>p]:text-gray-600
+                        [&>hr]:border-gray-200
+                        [&>hr]:my-4"
+                      dangerouslySetInnerHTML={{ __html: card.content }}
+                    />
+                  </motion.div>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-10 text-gray-500">
+                  <p>Belum ada informasi yang ditambahkan.</p>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-3">Persyaratan Pendaftaran</h3>
-                <ul className="text-gray-600 space-y-2">
-                  <li className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 mr-2"></span>
-                    <span>FC akta kelahiran</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 mr-2"></span>
-                    <span>FC kartu keluarga</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 mr-2"></span>
-                    <span>Pas foto anak</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 mr-2"></span>
-                    <span>Surat Keterangan Lulus</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 mr-2"></span>
-                    <span>FC KTP Orang Tua</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 mr-2"></span>
-                    <span>FC KIP (Jika Ada)</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 mr-2"></span>
-                    <span>FC Rapor (Jika sudah ada)</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 mr-2"></span>
-                    <span>FC Ijazah SMP (Jika sudah ada)</span>
-                  </li>
-                </ul>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={isInfoInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:border-orange-200 hover:shadow-md transition-all group"
-              >
-                <div className="w-12 h-12 rounded-lg bg-orange-100 flex items-center justify-center mb-4 group-hover:bg-orange-200 transition-all">
-                  <School className="text-orange-500 h-6 w-6" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-3">Program Keahlian</h3>
-                <div className="text-gray-600 space-y-3">
-                  <div>
-                    <h4 className="font-medium text-gray-800">Program Keahlian</h4>
-                    <p className="text-gray-600">Pengembangan Perangkat Lunak dan Gim</p>
-                  </div>
-
-                  <div>
-                    <h4 className="font-medium text-gray-800">Konsentrasi Keahlian (Kelas 11)</h4>
-                    <ul className="space-y-1 mt-1">
-                      <li className="flex items-start">
-                        <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 mr-2"></span>
-                        <span>Rekayasa Perangkat Lunak</span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 mr-2"></span>
-                        <span>Pemrograman Gim (Baru)</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <h4 className="font-medium text-gray-800 mb-2">Prestasi Tingkat Kabupaten</h4>
-                  <ul className="space-y-1 text-gray-600">
-                    <li className="flex items-start">
-                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 mr-2"></span>
-                      <span>2024 - Juara 1 LKS Bidang Web Technologies</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 mr-2"></span>
-                      <span>2023 - Juara 2 LKS Bidang Web Technologies</span>
-                    </li>
-                  </ul>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={isInfoInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:border-orange-200 hover:shadow-md transition-all group"
-              >
-                <div className="w-12 h-12 rounded-lg bg-orange-100 flex items-center justify-center mb-4 group-hover:bg-orange-200 transition-all">
-                  <Medal className="text-orange-500 h-6 w-6" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-3">Keunggulan SMK IT Baitul Aziz</h3>
-                <ul className="text-gray-600 space-y-2">
-                  <li className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 mr-2"></span>
-                    <span>Beasiswa KIP, prestasi, yatim, kurang mampu</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 mr-2"></span>
-                    <span>Berpeluang bisa bekerja</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 mr-2"></span>
-                    <span>Alumni tersebar kuliah di kampus UIN, UPI, Unisa Univ.Muhammadiyah, STMIK IM, Univ.Wanita International</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 mr-2"></span>
-                    <span>Bisa lanjut kuliah KIP</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 mr-2"></span>
-                    <span>Program Tahfidz Qur'an</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 mr-2"></span>
-                    <span>Pembelajaran berbasis industri</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 mr-2"></span>
-                    <span>Pendidikan berkarakter</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 mr-2"></span>
-                    <span>Magang di perusahaan 3-4 bulan</span>
-                  </li>
-                </ul>
-              </motion.div>
+              )}
             </div>
           </div>
         </section>
+
+        {/* Brochure Section */}
+        {ppdbSettings?.brochure && (
+          <section className="py-16 bg-gradient-to-b from-white to-gray-50">
+            <div className="container mx-auto px-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="max-w-3xl mx-auto"
+              >
+                <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                  {/* Image Preview for image files */}
+                  {['jpg', 'jpeg', 'png'].includes(ppdbSettings.brochure.extension.toLowerCase()) && (
+                    <div className="relative h-auto md:h-auto bg-gray-100 overflow-hidden">
+                      <img
+                        src={ppdbSettings.brochure.file}
+                        alt={ppdbSettings.brochure.title || 'Brosur SPMB'}
+                        className="w-full h-full object-contain"
+                      />
+                      <div className="absolute top-4 right-4 px-3 py-1 bg-orange-600 text-white text-xs font-semibold rounded-full">
+                        {ppdbSettings.brochure.extension.toUpperCase()}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="p-8 md:p-12">
+                    <div className="flex items-center mb-6">
+                      {/* Show icon only for PDF */}
+                      {ppdbSettings.brochure.extension === 'pdf' && (
+                        <div className="p-4 bg-orange-100 rounded-xl mr-4">
+                          <svg className="w-10 h-10 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                      )}
+                      <div className="flex-1">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-1">
+                          {ppdbSettings.brochure.title || 'Brosur SPMB'}
+                        </h2>
+                        <p className="text-sm text-gray-500">
+                          {ppdbSettings.brochure.extension === 'pdf' ? 'Dokumen PDF' : 'Gambar Brosur'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {ppdbSettings.brochure.description && (
+                      <p className="text-gray-600 mb-6 leading-relaxed">
+                        {ppdbSettings.brochure.description}
+                      </p>
+                    )}
+
+                    <div className="flex gap-4">
+                      <a
+                        href={ppdbSettings.brochure.file}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors"
+                      >
+                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        Lihat Brosur
+                      </a>
+                      <a
+                        href={route('ppdb.brochure.download')}
+                        className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-orange-600 text-white font-semibold rounded-xl hover:bg-orange-700 transition-colors shadow-lg shadow-orange-500/30"
+                      >
+                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Download Brosur
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </section>
+        )}
 
         {/* Timeline Section */}
         <section ref={timelineRef} className="py-16 bg-white relative">
@@ -318,7 +329,7 @@ export default function PpdbIndex({ hasRegistered = false, ppdbSettings }: PpdbI
           <div className="container mx-auto px-6 relative">
             <div className="max-w-3xl mx-auto text-center mb-16">
               <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                Jadwal <span className="text-orange-500">PPDB</span>
+                Jadwal <span className="text-orange-500">SPMB</span>
               </h2>
               <p className="text-gray-600">
                 Berikut adalah jadwal penting terkait Penerimaan Peserta Didik Baru SMK IT Baitul Aziz tahun ajaran 2025/2026
@@ -327,29 +338,37 @@ export default function PpdbIndex({ hasRegistered = false, ppdbSettings }: PpdbI
 
             <div className="max-w-4xl mx-auto">
               <div className="flex flex-col space-y-10">
-                {timeline.map((item, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={isTimelineInView ? { opacity: 1, y: 0 } : {}}
-                    transition={{ duration: 0.5, delay: 0.1 * index }}
-                    className="flex"
-                  >
-                    <div className="flex flex-col items-center mr-6">
-                      <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
-                        {item.icon}
-                      </div>
-                      {index !== timeline.length - 1 && (
-                        <div className="w-0.5 bg-orange-200 flex-1 my-2"></div>
-                      )}
+                <div className="flex flex-col space-y-10">
+                  {timelines.length > 0 ? (
+                    timelines.map((item, index) => (
+                      <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={isTimelineInView ? { opacity: 1, y: 0 } : {}}
+                        transition={{ duration: 0.5, delay: 0.1 * index }}
+                        className="flex"
+                      >
+                        <div className="flex flex-col items-center mr-6">
+                          <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-500">
+                            {getIcon(item.icon)}
+                          </div>
+                          {index !== timelines.length - 1 && (
+                            <div className="w-0.5 bg-orange-200 flex-1 my-2"></div>
+                          )}
+                        </div>
+                        <div className="pt-1.5">
+                          <h3 className="text-xl font-semibold text-gray-800 mb-1">{item.title}</h3>
+                          <p className="text-orange-500 font-medium mb-2">{item.date}</p>
+                          <p className="text-gray-600">{item.description}</p>
+                        </div>
+                      </motion.div>
+                    ))
+                  ) : (
+                    <div className="text-center py-10 text-gray-500">
+                      <p>Jadwal belum tersedia saat ini.</p>
                     </div>
-                    <div className="pt-1.5">
-                      <h3 className="text-xl font-semibold text-gray-800 mb-1">{item.title}</h3>
-                      <p className="text-orange-500 font-medium mb-2">{item.date}</p>
-                      <p className="text-gray-600">{item.description}</p>
-                    </div>
-                  </motion.div>
-                ))}
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -365,7 +384,7 @@ export default function PpdbIndex({ hasRegistered = false, ppdbSettings }: PpdbI
                 Hubungi <span className="text-orange-500">Kami</span>
               </h2>
               <p className="text-gray-600">
-                Untuk informasi lebih lanjut tentang PPDB SMK IT Baitul Aziz
+                Untuk informasi lebih lanjut tentang SPMB SMK IT Baitul Aziz
               </p>
             </div>
 
@@ -436,14 +455,14 @@ export default function PpdbIndex({ hasRegistered = false, ppdbSettings }: PpdbI
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 {hasRegistered ? (
                   <Link
-                    href="/ppdb/status"
+                    href="/spmb/status"
                     className="px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300"
                   >
                     Cek Status Pendaftaran
                   </Link>
                 ) : isOpen ? (
                   <Link
-                    href="/ppdb/pendaftaran"
+                    href="/spmb/pendaftaran"
                     className="px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300"
                   >
                     Daftar Sekarang

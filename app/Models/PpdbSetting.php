@@ -13,6 +13,9 @@ class PpdbSetting extends Model
         'close_date',
         'academic_year',
         'message_closed',
+        'brochure_file',
+        'brochure_title',
+        'brochure_description',
     ];
 
     protected $casts = [

@@ -42,16 +42,16 @@ const ProfileSekolah: React.FC = () => {
         </svg>
       ),
     },
-    {
-      id: 3,
-      name: 'Studio Multimedia',
-      description: 'Studio yang dilengkapi dengan peralatan audio visual profesional untuk mendukung pembelajaran multimedia dan konten digital.',
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-        </svg>
-      ),
-    },
+    // {
+    //   id: 3,
+    //   name: 'Studio Multimedia',
+    //   description: 'Studio yang dilengkapi dengan peralatan audio visual profesional untuk mendukung pembelajaran multimedia dan konten digital.',
+    //   icon: (
+    //     <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    //       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+    //     </svg>
+    //   ),
+    // },
     {
       id: 4,
       name: 'Perpustakaan Digital',
@@ -321,7 +321,7 @@ const ProfileSekolah: React.FC = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="bg-orange-50/80 backdrop-blur-sm border border-orange-100 rounded-xl p-8 hover:bg-orange-100 transition-all duration-300"
             >
-              <div className="max-w-4xl mx-auto">
+              {/* <div className="max-w-4xl mx-auto">
                 <div className="flex flex-col items-center mb-12">
                   <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-2 border-orange-500">
                     <div className="w-full h-full bg-gradient-to-br from-orange-100/60 to-orange-200/60 flex items-center justify-center">
@@ -332,9 +332,9 @@ const ProfileSekolah: React.FC = () => {
                   <p className="text-orange-500">Kepala Sekolah</p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12"> */}
                   {/* Wakil Kepala Sekolah */}
-                  {['Waka Kurikulum', 'Waka Kesiswaan', 'Waka Sarana Prasarana'].map((position, index) => (
+                  {/* {['Waka Kurikulum', 'Waka Kesiswaan', 'Waka Sarana Prasarana'].map((position, index) => (
                     <div key={index} className="flex flex-col items-center">
                       <div className="w-16 h-16 rounded-full overflow-hidden mb-3 border border-orange-200">
                         <div className="w-full h-full bg-gradient-to-br from-orange-100/40 to-orange-200/40 flex items-center justify-center">
@@ -347,9 +347,9 @@ const ProfileSekolah: React.FC = () => {
                   ))}
                 </div>
                 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6"> */}
                   {/* Ketua Program Keahlian */}
-                  {['Teknik Komputer Jaringan', 'Rekayasa Perangkat Lunak', 'Multimedia', 'Administrasi'].map((position, index) => (
+                  {/* {['Teknik Komputer Jaringan', 'Rekayasa Perangkat Lunak', 'Multimedia', 'Administrasi'].map((position, index) => (
                     <div key={index} className="flex flex-col items-center">
                       <div className="w-12 h-12 rounded-full overflow-hidden mb-2 border border-orange-100">
                         <div className="w-full h-full bg-gradient-to-br from-orange-100/20 to-orange-200/20 flex items-center justify-center">
@@ -372,7 +372,7 @@ const ProfileSekolah: React.FC = () => {
                     </svg>
                   </a>
                 </div>
-              </div>
+              </div> */}
             </motion.div>
           </div>
         </section>

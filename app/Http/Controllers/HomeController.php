@@ -20,7 +20,7 @@ class HomeController extends Controller
             ->latest()
             ->take(6)
             ->get();
-        
+
         // Ambil berita terbaru (maksimal 3)
         $latestNews = News::with('author')
             ->latest()
@@ -34,19 +34,68 @@ class HomeController extends Controller
     }
 
     /**
-     * Display the gallery page.
+     * Display the gallery page (album view — news with gallery photos).
      */
     public function gallery()
     {
-        // Ambil semua data galeri
-        $galleries = Gallery::with('user')->latest()->get();
-        
-        // Ambil semua kategori unik
-        $categories = Gallery::distinct()->pluck('category')->filter()->values();
+        // Ambil berita yang memiliki galeri foto, ditampilkan sebagai album
+        $albums = News::with('author')
+            ->withCount('galleryPhotos')
+            ->has('galleryPhotos')
+            ->latest()
+            ->get()
+            ->map(function ($news) {
+                // Ambil foto pertama sebagai cover album
+                $coverPhoto = $news->galleryPhotos()->first();
+                return [
+                    'id' => $news->id,
+                    'title' => $news->title,
+                    'slug' => $news->slug,
+                    'summary' => $news->summary,
+                    'image' => $news->image, // gambar utama berita sebagai cover
+                    'cover_photo' => $coverPhoto ? $coverPhoto->image : null,
+                    'category' => $news->category,
+                    'photo_count' => $news->gallery_photos_count,
+                    'created_at' => $news->created_at,
+                    'updated_at' => $news->updated_at,
+                    'author' => $news->author,
+                ];
+            });
+
+        // Ambil semua kategori unik dari berita yang punya galeri
+        $categories = News::has('galleryPhotos')
+            ->distinct()
+            ->pluck('category')
+            ->filter()
+            ->values();
 
         return Inertia::render('Gallery', [
-            'galleries' => $galleries,
+            'albums' => $albums,
             'categories' => $categories,
+        ]);
+    }
+
+    /**
+     * Display a gallery album detail (all photos from a news article).
+     */
+    public function galleryDetail($slug)
+    {
+        $news = News::with(['author', 'galleryPhotos'])
+            ->where('slug', $slug)
+            ->firstOrFail();
+
+        return Inertia::render('GalleryDetail', [
+            'album' => [
+                'id' => $news->id,
+                'title' => $news->title,
+                'slug' => $news->slug,
+                'summary' => $news->summary,
+                'image' => $news->image,
+                'category' => $news->category,
+                'created_at' => $news->created_at,
+                'author' => $news->author,
+            ],
+            'photos' => $news->galleryPhotos,
         ]);
     }
 
@@ -57,7 +106,7 @@ class HomeController extends Controller
     {
         // Ambil semua berita
         $news = News::with('author')->latest()->get();
-        
+
         // Ambil berita yang ditandai sebagai featured
         $featured = News::with('author')
             ->where('is_featured', true)
@@ -80,12 +129,12 @@ class HomeController extends Controller
     public function newsDetail($slug)
     {
         // Cari berita berdasarkan slug, jika tidak ditemukan coba berdasarkan ID
-        $news = News::with('author')
+        $news = News::with(['author', 'galleryPhotos'])
             ->where('slug', $slug)
             ->first();
 
         if (!$news && is_numeric($slug)) {
-            $news = News::with('author')->find($slug);
+            $news = News::with(['author', 'galleryPhotos'])->find($slug);
         }
 
         if (!$news) {
@@ -129,4 +178,4 @@ class HomeController extends Controller
     {
         return Inertia::render('Contact');
     }
-} 
+}

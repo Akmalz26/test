@@ -12,6 +12,7 @@ interface User {
 interface NewsItem {
   id: number;
   title: string;
+  slug: string;
   summary: string | null;
   content: string;
   image: string | null;
@@ -30,12 +31,13 @@ interface NewsSectionProps {
 const NewsSection: React.FC<NewsSectionProps> = ({ latestNews = [] }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: false, amount: 0.2 });
-  
+
   // Jika tidak ada data dari database, gunakan contoh data statis
   const newsItems = latestNews.length > 0 ? latestNews : [
     {
       id: 1,
       title: 'Pendaftaran Tahun Ajaran 2023/2024 Telah Dibuka',
+      slug: 'pendaftaran-tahun-ajaran-2023-2024-telah-dibuka',
       summary: 'SMK IT Baitul Aziz membuka pendaftaran siswa baru untuk tahun ajaran 2023/2024. Dapatkan kesempatan beasiswa untuk siswa berprestasi.',
       content: '',
       image: '/images/news/placeholder.jpg',
@@ -49,6 +51,7 @@ const NewsSection: React.FC<NewsSectionProps> = ({ latestNews = [] }) => {
     {
       id: 2,
       title: 'Siswa Kami Raih Juara 1 Lomba Web Design Tingkat Nasional',
+      slug: 'siswa-kami-raih-juara-1-lomba-web-design-tingkat-nasional',
       summary: 'Tim web design SMK IT Baitul Aziz berhasil meraih juara 1 dalam Kompetisi Web Design Tingkat Nasional yang diselenggarakan oleh Kementerian Pendidikan.',
       content: '',
       image: '/images/news/placeholder.jpg',
@@ -62,6 +65,7 @@ const NewsSection: React.FC<NewsSectionProps> = ({ latestNews = [] }) => {
     {
       id: 3,
       title: 'Workshop Artificial Intelligence dan Machine Learning',
+      slug: 'workshop-artificial-intelligence-dan-machine-learning',
       summary: 'SMK IT Baitul Aziz menyelenggarakan workshop AI dan Machine Learning dengan menghadirkan praktisi industri dari perusahaan teknologi terkemuka.',
       content: '',
       image: '/images/news/placeholder.jpg',
@@ -95,10 +99,10 @@ const NewsSection: React.FC<NewsSectionProps> = ({ latestNews = [] }) => {
 
   // Format tanggal ke format Indonesia
   const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = { 
-      day: 'numeric', 
-      month: 'long', 
-      year: 'numeric' 
+    const options: Intl.DateTimeFormatOptions = {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
     };
     return new Date(dateString).toLocaleDateString('id-ID', options);
   };
@@ -125,7 +129,7 @@ const NewsSection: React.FC<NewsSectionProps> = ({ latestNews = [] }) => {
             Ikuti perkembangan terkini dan informasi seputar kegiatan di SMK IT Baitul Aziz
           </p>
         </motion.div>
-        
+
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -154,13 +158,13 @@ const NewsSection: React.FC<NewsSectionProps> = ({ latestNews = [] }) => {
                     }}
                   />
                 ) : null}
-                <ImagePlaceholder 
-                  width="100%" 
-                  height="100%" 
+                <ImagePlaceholder
+                  width="100%"
+                  height="100%"
                   text={news.title}
-                  className={news.image ? 'hidden' : ''} 
+                  className={news.image ? 'hidden' : ''}
                 />
-                
+
                 {news.category && (
                   <div className="absolute top-0 left-0 m-3">
                     <span className="inline-block px-3 py-1 bg-orange-500 text-white text-xs font-semibold rounded-full">
@@ -168,11 +172,11 @@ const NewsSection: React.FC<NewsSectionProps> = ({ latestNews = [] }) => {
                     </span>
                   </div>
                 )}
-                
+
                 {/* Decorative element */}
                 <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-orange-500/40 rounded-tr-lg"></div>
               </div>
-              
+
               <div className="p-6">
                 <div className="text-orange-500/80 text-sm mb-2">{formatDate(news.created_at)}</div>
                 <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-orange-500 transition-colors duration-300">
@@ -181,8 +185,8 @@ const NewsSection: React.FC<NewsSectionProps> = ({ latestNews = [] }) => {
                 <p className="text-gray-600 text-sm mb-4 line-clamp-3">
                   {news.summary}
                 </p>
-                <Link 
-                  href={`/berita/${news.id}`} 
+                <Link
+                  href={`/berita/${news.slug}`}
                   className="inline-flex items-center text-orange-500 hover:text-orange-600 transition-colors duration-300"
                 >
                   <span>Baca selengkapnya</span>
@@ -194,7 +198,7 @@ const NewsSection: React.FC<NewsSectionProps> = ({ latestNews = [] }) => {
             </motion.div>
           ))}
         </motion.div>
-        
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}

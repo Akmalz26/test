@@ -1,118 +1,80 @@
 import React, { useState, useRef } from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ImagePlaceholder from '../components/ImagePlaceholder';
 
-// Interface untuk User
-interface User {
+interface Author {
   id: number;
   name: string;
   email: string;
 }
 
-// Interface untuk GalleryItem
-interface GalleryItem {
+interface Album {
   id: number;
   title: string;
-  description: string | null;
-  image: string;
+  slug: string;
+  summary: string | null;
+  image: string | null;
+  cover_photo: string | null;
   category: string | null;
-  is_featured: boolean;
+  photo_count: number;
   created_at: string;
   updated_at: string;
-  user: User;
+  author: Author;
 }
 
-// Interface untuk props halaman Gallery
 interface GalleryProps {
-  galleries?: GalleryItem[];
+  albums?: Album[];
   categories?: string[];
 }
 
-const Gallery: React.FC<GalleryProps> = ({ galleries = [], categories = [] }) => {
+const Gallery: React.FC<GalleryProps> = ({ albums = [], categories = [] }) => {
   const heroRef = useRef(null);
   const isHeroInView = useInView(heroRef, { once: true });
-  
-  const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>('semua');
-  
-  // Jika tidak ada data dari database, gunakan data statis
-  const galleryItems = galleries.length > 0 ? galleries : [
-    {
-      id: 1,
-      title: 'Praktikum Lab Komputer',
-      description: 'Siswa PPLG belajar praktik pengembangan aplikasi web di lab komputer',
-      image: '/images/gallery/programming-lab.jpg',
-      category: 'kegiatan-belajar',
-      is_featured: true,
-      created_at: '2023-03-15',
-      updated_at: '2023-03-15',
-      user: { id: 1, name: 'Admin', email: '' }
-    },
-    // ...data statis lainnya
-  ];
-  
-  // Kategori-kategori yang akan ditampilkan
+
   const categoryOptions = [
     { id: 'semua', name: 'Semua' }
   ];
-  
-  // Menambahkan kategori dari data yang ada
+
   if (categories.length > 0) {
     categories.forEach(category => {
       categoryOptions.push({ id: category, name: capitalize(category) });
     });
-  } else {
-    // Kategori default jika tidak ada data
-    categoryOptions.push(
-      { id: 'kegiatan-belajar', name: 'Kegiatan Belajar' },
-      { id: 'workshop', name: 'Workshop' },
-      { id: 'kompetisi', name: 'Kompetisi' },
-      { id: 'prestasi', name: 'Prestasi' },
-      { id: 'event', name: 'Event' },
-      { id: 'fasilitas', name: 'Fasilitas' },
-      { id: 'kunjungan', name: 'Kunjungan Industri' },
-      { id: 'ekstrakurikuler', name: 'Ekstrakurikuler' },
-      { id: 'magang', name: 'Magang' }
-    );
   }
-  
-  // Helper function untuk kapitalisasi string
+
   function capitalize(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1).replace(/-/g, ' ');
   }
-  
-  // Format tanggal ke format Indonesia
+
   const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = { 
-      day: 'numeric', 
-      month: 'long', 
-      year: 'numeric' 
+    const options: Intl.DateTimeFormatOptions = {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
     };
     return new Date(dateString).toLocaleDateString('id-ID', options);
   };
-  
-  // Filter gallery berdasarkan kategori
-  const filteredGallery = activeCategory === 'semua'
-    ? galleryItems
-    : galleryItems.filter(item => item.category === activeCategory);
+
+  const filteredAlbums = activeCategory === 'semua'
+    ? albums
+    : albums.filter(item => item.category === activeCategory);
 
   return (
     <>
       <Head title="Galeri - SMK IT Baitul Aziz" />
-      
+
       <div className="min-h-screen bg-white text-gray-800">
         <Navbar />
-        
+
         {/* Hero Section */}
         <section ref={heroRef} className="relative py-32 overflow-hidden">
-          {/* Background Elements */}
-          <div className="absolute inset-0 bg-gradient-to-b from-white to-white"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-white to-gray-50"></div>
           <div className="absolute inset-0 bg-[url('/images/circuit-pattern.svg')] opacity-10 bg-repeat"></div>
           <div className="absolute top-0 right-0 w-[40%] h-[40%] bg-orange-500/20 blur-[100px] rounded-full"></div>
-          
+
           <div className="container mx-auto px-6 relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -121,178 +83,155 @@ const Gallery: React.FC<GalleryProps> = ({ galleries = [], categories = [] }) =>
               className="text-center max-w-4xl mx-auto"
             >
               <div className="inline-block px-5 py-1.5 mb-6 rounded-full bg-gradient-to-r from-orange-500/20 to-orange-600/20 text-orange-500 text-sm font-medium border border-orange-500/20">
-                Momen-momen berharga
+                Album Foto Kegiatan
               </div>
-              
+
               <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900 leading-tight">
-                Galeri <span className="text-orange-500">Kegiatan</span> Sekolah
+                Galeri <span className="text-orange-500">Album</span> Sekolah
               </h1>
-              
+
               <p className="text-gray-700 text-lg md:text-xl mb-10 max-w-3xl mx-auto">
-                Dokumentasi visual perjalanan pembelajaran dan aktivitas di SMK IT Baitul Aziz
+                Kumpulan album foto dokumentasi kegiatan dan momen berharga di SMK IT Baitul Aziz
               </p>
-              
-              <div className="relative w-full max-w-4xl mx-auto">
-                <div className="absolute inset-0 bg-gradient-to-r from-orange-500/30 via-transparent to-orange-500/30 blur-xl opacity-50 -z-10 rounded-2xl"></div>
-                
-                {/* Kategori Filter */}
+
+              {/* Category Filter */}
+              {categoryOptions.length > 1 && (
                 <div className="flex items-center justify-center flex-wrap gap-3 py-2">
                   {categoryOptions.map((category) => (
                     <button
                       key={category.id}
                       onClick={() => setActiveCategory(category.id)}
-                      className={`px-4 py-2   rounded-lg text-sm transition-all duration-300 ${
-                        activeCategory === category.id
+                      className={`px-4 py-2 rounded-lg text-sm transition-all duration-300 ${activeCategory === category.id
                           ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/25'
-                          : 'bg-white/10 text-gray-700 hover:bg-white/20'
-                      }`}
+                          : 'bg-white/80 text-gray-700 hover:bg-orange-50 border border-gray-200'
+                        }`}
                     >
                       {category.name}
                     </button>
                   ))}
                 </div>
-              </div>
+              )}
             </motion.div>
           </div>
         </section>
-        
-        {/* Gallery Grid */}
+
+        {/* Album Grid */}
         <section className="py-16 relative">
           <div className="container mx-auto px-6">
             <AnimatePresence>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredGallery.length > 0 ? (
-                  filteredGallery.map((item) => (
+              {filteredAlbums.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {filteredAlbums.map((album, index) => (
                     <motion.div
-                      key={item.id}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      transition={{ duration: 0.4 }}
+                      key={album.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 20 }}
+                      transition={{ duration: 0.4, delay: index * 0.1 }}
                       layout
-                      className="group"
                     >
-                      <div 
-                        className="relative overflow-hidden rounded-xl cursor-pointer h-[250px] bg-white/5 border border-white/10"
-                        onClick={() => setSelectedImage(item)}
+                      <Link
+                        href={`/gallery/${album.slug}`}
+                        className="group block"
                       >
-                        {item.image ? (
-                          <img 
-                            src={item.image} 
-                            alt={item.title}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = 'none';
-                              const nextElement = target.nextElementSibling as HTMLElement;
-                              if (nextElement) {
-                                nextElement.style.display = 'flex';
-                              }
-                            }}
-                          />
-                        ) : null}
-                        <ImagePlaceholder 
-                          width="100%" 
-                          height="100%" 
-                          text={item.title}
-                          className={item.image ? 'hidden' : ''} 
-                        />
+                        <div className="relative overflow-hidden rounded-2xl bg-white shadow-md hover:shadow-xl transition-all duration-500 border border-gray-100">
+                          {/* Album Cover */}
+                          <div className="relative h-[260px] overflow-hidden">
+                            {album.image ? (
+                              <img
+                                src={album.image}
+                                alt={album.title}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                  const nextElement = target.nextElementSibling as HTMLElement;
+                                  if (nextElement) {
+                                    nextElement.style.display = 'flex';
+                                  }
+                                }}
+                              />
+                            ) : null}
+                            <ImagePlaceholder
+                              width="100%"
+                              height="100%"
+                              text={album.title}
+                              className={album.image ? 'hidden' : ''}
+                            />
 
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 p-4 flex flex-col justify-end">
-                          <h3 className="text-white text-lg font-semibold line-clamp-2 mb-1">{item.title}</h3>
-                          {item.category && (
-                            <span className="text-orange-500 text-sm">{capitalize(item.category)}</span>
-                          )}
-                          <span className="text-white/70 text-xs mt-1">{formatDate(item.created_at)}</span>
+                            {/* Overlay Gradient */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+                            {/* Photo Count Badge */}
+                            <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-1.5">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                              {album.photo_count} Foto
+                            </div>
+
+                            {/* Album Info at bottom */}
+                            <div className="absolute bottom-0 left-0 right-0 p-5">
+                              <h3 className="text-white text-xl font-bold leading-tight line-clamp-2 group-hover:text-orange-300 transition-colors">
+                                {album.title}
+                              </h3>
+                              {album.category && (
+                                <span className="inline-block mt-2 px-2.5 py-0.5 bg-orange-500/30 backdrop-blur-sm text-orange-200 text-xs font-medium rounded-full">
+                                  {capitalize(album.category)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Album Footer */}
+                          <div className="p-4 flex items-center justify-between">
+                            <div className="flex items-center gap-2 text-gray-500 text-sm">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                              {formatDate(album.created_at)}
+                            </div>
+                            <div className="text-orange-500 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                              Lihat Album
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </div>
+                          </div>
                         </div>
-                      </div>
+                      </Link>
                     </motion.div>
-                  ))
-                ) : (
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="col-span-full text-center py-16"
-                  >
-                    <div className="text-white/50 text-xl">Tidak ada galeri untuk kategori ini</div>
-                  </motion.div>
-                )}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-20"
+                >
+                  <div className="max-w-sm mx-auto">
+                    <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-700 mb-2">Belum Ada Album</h3>
+                    <p className="text-gray-500">
+                      {activeCategory !== 'semua'
+                        ? 'Tidak ada album untuk kategori ini'
+                        : 'Album galeri foto akan segera ditambahkan'}
+                    </p>
+                  </div>
+                </motion.div>
+              )}
             </AnimatePresence>
           </div>
         </section>
-        
-        {/* Lightbox untuk melihat gambar yang dipilih */}
-        {selectedImage && (
-          <div 
-            className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 md:p-10" 
-            onClick={() => setSelectedImage(null)}
-          >
-            <div 
-              className="max-w-5xl w-full rounded-lg overflow-hidden bg-white/5 backdrop-blur-md"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="relative aspect-video w-full bg-black/50 flex items-center justify-center">
-                {selectedImage.image ? (
-                  <img 
-                    src={selectedImage.image} 
-                    alt={selectedImage.title} 
-                    className="max-w-full max-h-full object-contain"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      const nextElement = target.nextElementSibling as HTMLElement;
-                      if (nextElement) {
-                        nextElement.style.display = 'flex';
-                      }
-                    }}
-                  />
-                ) : null}
-                <ImagePlaceholder 
-                  width="100%" 
-                  height="100%" 
-                  text={selectedImage.title}
-                  className={selectedImage.image ? 'hidden' : ''} 
-                />
-                
-                <button 
-                  className="absolute top-4 right-4 bg-black/50 p-2 rounded-full text-white hover:bg-black/70 transition-colors"
-                  onClick={() => setSelectedImage(null)}
-                  title="Tutup"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-xl font-bold text-white">{selectedImage.title}</h3>
-                  {selectedImage.category && (
-                    <span className="inline-block px-3 py-1 bg-orange-500/20 text-orange-500 text-xs font-semibold rounded-full">
-                      {capitalize(selectedImage.category)}
-                    </span>
-                  )}
-                </div>
-                
-                {selectedImage.description && (
-                  <p className="text-white/70 mb-4">{selectedImage.description}</p>
-                )}
-                
-                <div className="flex items-center justify-between text-white/50 text-sm">
-                  <span>{formatDate(selectedImage.created_at)}</span>
-                  <span>Oleh: {selectedImage.user.name}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-        
+
         <Footer />
       </div>
     </>
   );
 };
 
-export default Gallery; 
+export default Gallery;

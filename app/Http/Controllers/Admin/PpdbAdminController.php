@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Ppdb;
 use App\Models\PpdbSetting;
+use App\Models\PpdbTimeline;
+use App\Models\PpdbInfoCard;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -24,36 +26,36 @@ class PpdbAdminController extends Controller
     public function index(Request $request)
     {
         $query = Ppdb::with('user');
-        
+
         // Filter berdasarkan pencarian
         if ($request->has('search') && $request->search !== '') {
-            $query->where(function($q) use ($request) {
+            $query->where(function ($q) use ($request) {
                 $q->where('nama_lengkap', 'like', '%' . $request->search . '%')
-                  ->orWhere('nomor_pendaftaran', 'like', '%' . $request->search . '%')
-                  ->orWhere('nisn', 'like', '%' . $request->search . '%');
+                    ->orWhere('nomor_pendaftaran', 'like', '%' . $request->search . '%')
+                    ->orWhere('nisn', 'like', '%' . $request->search . '%');
             });
         }
-        
+
         // Filter berdasarkan status
         if ($request->has('status') && $request->status !== '') {
             $query->where('status', $request->status);
         }
-        
+
         // Filter berdasarkan jurusan
         if ($request->has('jurusan') && $request->jurusan !== '') {
-            $query->where(function($q) use ($request) {
+            $query->where(function ($q) use ($request) {
                 $q->where('jurusan_1', $request->jurusan)
-                  ->orWhere('jurusan_2', $request->jurusan);
+                    ->orWhere('jurusan_2', $request->jurusan);
             });
         }
-        
+
         // Filter berdasarkan tahun
         if ($request->has('tahun') && $request->tahun !== '') {
             $query->whereYear('created_at', $request->tahun);
         }
-        
+
         $applications = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
-        
+
         // Statistik
         $stats = [
             'total' => Ppdb::count(),
@@ -83,13 +85,13 @@ class PpdbAdminController extends Controller
             'ditolak' => Ppdb::where('status', 'Ditolak')->count(),
             'cadangan' => Ppdb::where('status', 'Cadangan')->count()
         ];
-        
+
         // Pendaftar terbaru
         $recent = Ppdb::with('user')
-                    ->orderBy('created_at', 'desc')
-                    ->limit(5)
-                    ->get();
-        
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
         // Data jurusan
         $jurusan = [
             [
@@ -98,7 +100,7 @@ class PpdbAdminController extends Controller
                 'kuota' => 40
             ]
         ];
-        
+
         return Inertia::render('Admin/Ppdb/Dashboard', [
             'stats' => $stats,
             'recent' => $recent,
@@ -113,7 +115,7 @@ class PpdbAdminController extends Controller
     {
         // Dokumen
         $documents = [];
-        
+
         if ($ppdb->foto) {
             $documents[] = [
                 'name' => 'Foto',
@@ -121,7 +123,7 @@ class PpdbAdminController extends Controller
                 'url' => $ppdb->foto_url
             ];
         }
-        
+
         if ($ppdb->rapor_file) {
             $documents[] = [
                 'name' => 'Rapor',
@@ -129,7 +131,7 @@ class PpdbAdminController extends Controller
                 'url' => $ppdb->rapor_file_url
             ];
         }
-        
+
         if ($ppdb->ijazah_file) {
             $documents[] = [
                 'name' => 'Ijazah',
@@ -137,7 +139,7 @@ class PpdbAdminController extends Controller
                 'url' => $ppdb->ijazah_file_url
             ];
         }
-        
+
         if ($ppdb->skhun_file) {
             $documents[] = [
                 'name' => 'SKHUN',
@@ -145,7 +147,7 @@ class PpdbAdminController extends Controller
                 'url' => $ppdb->skhun_file_url
             ];
         }
-        
+
         if ($ppdb->kk_file) {
             $documents[] = [
                 'name' => 'Kartu Keluarga',
@@ -153,7 +155,7 @@ class PpdbAdminController extends Controller
                 'url' => $ppdb->kk_file_url
             ];
         }
-        
+
         if ($ppdb->akta_lahir_file) {
             $documents[] = [
                 'name' => 'Akta Kelahiran',
@@ -161,7 +163,7 @@ class PpdbAdminController extends Controller
                 'url' => $ppdb->akta_lahir_file_url
             ];
         }
-        
+
         if ($ppdb->ktp_ortu_file) {
             $documents[] = [
                 'name' => 'KTP Orang Tua',
@@ -169,7 +171,7 @@ class PpdbAdminController extends Controller
                 'url' => $ppdb->ktp_ortu_file_url
             ];
         }
-        
+
         if ($ppdb->kip_kks_kps_file) {
             $documents[] = [
                 'name' => 'KIP/KKS/KPS',
@@ -212,18 +214,18 @@ class PpdbAdminController extends Controller
             'ppdb' => $ppdb->load('user')
         ]);
     }
-    
+
     /**
      * Export data PPDB ke file Excel (.xlsx)
      */
     public function export()
     {
         $applications = Ppdb::with('user')->get();
-        
+
         // Buat spreadsheet baru
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        
+
         // Judul kolom
         $columns = [
             'No. Pendaftaran',
@@ -244,19 +246,19 @@ class PpdbAdminController extends Controller
             'No. Telepon',
             'Status'
         ];
-        
+
         // Tulis header
         foreach ($columns as $key => $column) {
             $cell = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($key + 1) . '1';
             $sheet->setCellValue($cell, $column);
-            
+
             // Atur format header (bold, center)
             $sheet->getStyle($cell)->getFont()->setBold(true);
             $sheet->getStyle($cell)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle($cell)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('F5F5F5');
             $sheet->getStyle($cell)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
         }
-        
+
         // Tulis data
         $row = 2;
         foreach ($applications as $ppdb) {
@@ -279,41 +281,38 @@ class PpdbAdminController extends Controller
                 $ppdb->telepon_hp,
                 $ppdb->status
             ];
-            
+
             foreach ($data as $key => $value) {
                 $cell = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($key + 1) . $row;
                 $sheet->setCellValue($cell, $value);
                 $sheet->getStyle($cell)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
             }
-            
+
             $row++;
         }
-        
+
         // Atur lebar kolom secara otomatis
         foreach (range(1, count($columns)) as $col) {
             $sheet->getColumnDimension(\PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col))->setAutoSize(true);
         }
-        
+
         // Buat writer dan output
         $writer = new Xlsx($spreadsheet);
         $filename = 'data_ppdb_' . date('Y-m-d') . '.xlsx';
-        
+
         // Simpan ke output langsung
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Cache-Control: max-age=0');
-        
+
         $writer->save('php://output');
         exit;
     }
 
-    /**
-     * Display PPDB settings page
-     */
     public function settings()
     {
         $settings = PpdbSetting::current();
-        
+
         // If no settings exist, create default
         if (!$settings) {
             $settings = PpdbSetting::create([
@@ -323,8 +322,13 @@ class PpdbAdminController extends Controller
             ]);
         }
 
+        $timelines = PpdbTimeline::orderBy('order', 'asc')->get();
+        $infoCards = PpdbInfoCard::orderBy('order', 'asc')->get();
+
         return Inertia::render('Admin/Ppdb/Settings', [
-            'settings' => $settings
+            'settings' => $settings,
+            'timelines' => $timelines,
+            'infoCards' => $infoCards
         ]);
     }
 
@@ -339,12 +343,38 @@ class PpdbAdminController extends Controller
             'close_date' => 'nullable|date|after_or_equal:open_date',
             'academic_year' => 'nullable|string|max:20',
             'message_closed' => 'nullable|string|max:500',
+            'brochure_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240', // 10MB max
+            'brochure_title' => 'nullable|string|max:255',
+            'brochure_description' => 'nullable|string|max:1000',
+            'delete_brochure' => 'nullable|boolean',
         ]);
 
         $settings = PpdbSetting::current();
-        
+
         if (!$settings) {
             $settings = new PpdbSetting();
+        }
+
+        // Handle brochure file upload
+        if ($request->hasFile('brochure_file')) {
+            // Delete old file if exists
+            if ($settings->brochure_file && Storage::disk('public')->exists($settings->brochure_file)) {
+                Storage::disk('public')->delete($settings->brochure_file);
+            }
+
+            // Store new file
+            $path = $request->file('brochure_file')->store('ppdb/brochures', 'public');
+            $validatedData['brochure_file'] = $path;
+        }
+
+        // Handle brochure deletion
+        if ($request->input('delete_brochure')) {
+            if ($settings->brochure_file && Storage::disk('public')->exists($settings->brochure_file)) {
+                Storage::disk('public')->delete($settings->brochure_file);
+            }
+            $validatedData['brochure_file'] = null;
+            $validatedData['brochure_title'] = null;
+            $validatedData['brochure_description'] = null;
         }
 
         $settings->fill($validatedData);
@@ -363,38 +393,67 @@ class PpdbAdminController extends Controller
         if ($ppdb->foto) {
             Storage::delete('public/' . $ppdb->foto);
         }
-        
+
         if ($ppdb->rapor_file) {
             Storage::delete('public/' . $ppdb->rapor_file);
         }
-        
+
         if ($ppdb->ijazah_file) {
             Storage::delete('public/' . $ppdb->ijazah_file);
         }
-        
+
         if ($ppdb->skhun_file) {
             Storage::delete('public/' . $ppdb->skhun_file);
         }
-        
+
         if ($ppdb->kk_file) {
             Storage::delete('public/' . $ppdb->kk_file);
         }
-        
+
         if ($ppdb->akta_lahir_file) {
             Storage::delete('public/' . $ppdb->akta_lahir_file);
         }
-        
+
         if ($ppdb->ktp_ortu_file) {
             Storage::delete('public/' . $ppdb->ktp_ortu_file);
         }
-        
+
         if ($ppdb->kip_kks_kps_file) {
             Storage::delete('public/' . $ppdb->kip_kks_kps_file);
         }
-        
+
         // Hapus data pendaftaran
         $ppdb->delete();
-        
+
         return redirect()->route('admin.ppdb.index')->with('success', 'Data pendaftaran berhasil dihapus.');
+    }
+
+    /**
+     * Download applicant document
+     */
+    public function downloadDocument(Ppdb $ppdb, $documentType)
+    {
+        $documentMap = [
+            'foto' => $ppdb->foto,
+            'kk' => $ppdb->kk_file,
+            'akta' => $ppdb->akta_lahir_file,
+            'ijazah' => $ppdb->ijazah_file,
+            'rapor' => $ppdb->rapor_file,
+            'skhun' => $ppdb->skhun_file,
+            'ktp_ortu' => $ppdb->ktp_ortu_file,
+            'kip' => $ppdb->kip_kks_kps_file,
+        ];
+
+        if (!isset($documentMap[$documentType]) || !$documentMap[$documentType]) {
+            abort(404, 'Dokumen tidak ditemukan');
+        }
+
+        $filePath = storage_path('app/public/' . $documentMap[$documentType]);
+
+        if (!file_exists($filePath)) {
+            abort(404, 'File tidak ditemukan');
+        }
+
+        return response()->download($filePath);
     }
 }

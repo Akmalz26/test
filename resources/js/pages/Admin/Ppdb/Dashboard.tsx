@@ -22,82 +22,82 @@ export default function AdminPpdbDashboard({
 }) {
   return (
     <AdminLayout>
-      <Head title="Dashboard PPDB - Admin Dashboard" />
+      <Head title="Dashboard SPMB - Admin Dashboard" />
 
-      <div className="px-6 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
-            Dashboard PPDB
+      <div className="px-4 py-6 sm:px-6 sm:py-8">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight">
+            Dashboard SPMB
           </h1>
-          <p className="mt-2 text-blue-100 text-lg">
+          <p className="mt-1 sm:mt-2 text-blue-100 text-sm sm:text-base lg:text-lg">
             Ringkasan dan statistik pendaftaran peserta didik baru.
           </p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="px-6 py-5 flex items-center justify-between">
+            <div className="px-4 py-4 sm:px-6 sm:py-5 flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Pendaftar</p>
-                <h3 className="text-4xl font-bold text-gray-900 mt-2 tracking-tight">{stats.total}</h3>
+                <p className="text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">Total Pendaftar</p>
+                <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mt-1 sm:mt-2 tracking-tight">{stats.total}</h3>
               </div>
-              <div className="w-12 h-12 rounded-lg bg-indigo-50 flex items-center justify-center">
-                <Users className="h-6 w-6 text-indigo-500" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-indigo-50 flex items-center justify-center">
+                <Users className="h-5 w-5 sm:h-6 sm:w-6 text-indigo-500" />
               </div>
             </div>
-            <div className="px-6 py-2 bg-gray-50 border-t border-gray-200">
-              <Link href={route('admin.ppdb.index')} className="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+            <div className="px-4 py-2 sm:px-6 bg-gray-50 border-t border-gray-200">
+              <Link href={route('admin.ppdb.index')} className="text-xs sm:text-sm text-indigo-600 hover:text-indigo-800 font-medium">
                 Lihat semua pendaftar
               </Link>
             </div>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="px-6 py-5 flex items-center justify-between">
+            <div className="px-4 py-4 sm:px-6 sm:py-5 flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Pendaftar Diterima</p>
-                <h3 className="text-4xl font-bold text-green-600 mt-2 tracking-tight">{stats.diterima}</h3>
+                <p className="text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">Pendaftar Diterima</p>
+                <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-green-600 mt-1 sm:mt-2 tracking-tight">{stats.diterima}</h3>
               </div>
-              <div className="w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center">
-                <CheckCircle className="h-6 w-6 text-green-500" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-green-50 flex items-center justify-center">
+                <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />
               </div>
             </div>
-            <div className="px-6 py-2 bg-gray-50 border-t border-gray-200">
-              <Link href={`${route('admin.ppdb.index')}?status=diterima`} className="text-sm text-green-600 hover:text-green-800 font-medium">
+            <div className="px-4 py-2 sm:px-6 bg-gray-50 border-t border-gray-200">
+              <Link href={`${route('admin.ppdb.index')}?status=diterima`} className="text-xs sm:text-sm text-green-600 hover:text-green-800 font-medium">
                 Lihat pendaftar diterima
               </Link>
             </div>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="px-6 py-5 flex items-center justify-between">
+            <div className="px-4 py-4 sm:px-6 sm:py-5 flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Menunggu Verifikasi</p>
-                <h3 className="text-4xl font-bold text-amber-600 mt-2 tracking-tight">{stats.menunggu}</h3>
+                <p className="text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">Menunggu Verifikasi</p>
+                <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-amber-600 mt-1 sm:mt-2 tracking-tight">{stats.menunggu}</h3>
               </div>
-              <div className="w-12 h-12 rounded-lg bg-amber-50 flex items-center justify-center">
-                <Clock className="h-6 w-6 text-amber-500" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-amber-50 flex items-center justify-center">
+                <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-amber-500" />
               </div>
             </div>
-            <div className="px-6 py-2 bg-gray-50 border-t border-gray-200">
-              <Link href={`${route('admin.ppdb.index')}?status=menunggu`} className="text-sm text-amber-600 hover:text-amber-800 font-medium">
+            <div className="px-4 py-2 sm:px-6 bg-gray-50 border-t border-gray-200">
+              <Link href={`${route('admin.ppdb.index')}?status=menunggu`} className="text-xs sm:text-sm text-amber-600 hover:text-amber-800 font-medium">
                 Lihat pendaftar menunggu
               </Link>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           <div className="lg:col-span-2">
             {/* Status Breakdown */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-900">Status Pendaftaran</h2>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6 sm:mb-8">
+              <div className="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900">Status Pendaftaran</h2>
               </div>
 
-              <div className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="p-4 sm:p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
                   <StatusCard
                     title="Menunggu Verifikasi"
                     count={stats.menunggu}
@@ -151,22 +151,22 @@ export default function AdminPpdbDashboard({
 
             {/* Pendaftar Per Jurusan */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-900">Pendaftar per Jurusan</h2>
+              <div className="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900">Pendaftar per Jurusan</h2>
               </div>
 
-              <div className="p-6">
-                <div className="space-y-4">
+              <div className="p-4 sm:p-6">
+                <div className="space-y-3 sm:space-y-4">
                   {jurusan.map((item, index) => (
-                    <div key={index} className="bg-gray-50 rounded-lg border border-gray-200 p-4">
-                      <div className="flex items-start justify-between">
+                    <div key={index} className="bg-gray-50 rounded-lg border border-gray-200 p-3 sm:p-4">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-0">
                         <div className="flex items-center">
-                          <div className={`w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center mr-4`}>
-                            <GraduationCap className="h-6 w-6 text-orange-600" />
+                          <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-orange-50 flex items-center justify-center mr-3 sm:mr-4 flex-shrink-0`}>
+                            <GraduationCap className="h-5 w-5 sm:h-6 sm:w-6 text-orange-600" />
                           </div>
-                          <div>
-                            <h3 className="text-gray-900 font-semibold text-lg">{item.nama}</h3>
-                            <p className="text-gray-500 text-sm">
+                          <div className="min-w-0">
+                            <h3 className="text-gray-900 font-semibold text-base sm:text-lg truncate">{item.nama}</h3>
+                            <p className="text-gray-500 text-xs sm:text-sm">
                               {item.total} pendaftar
                               {item.kuota && ` (Kuota: ${item.kuota})`}
                             </p>
@@ -175,7 +175,7 @@ export default function AdminPpdbDashboard({
 
                         <Link
                           href={`${route('admin.ppdb.index')}?jurusan=${encodeURIComponent(item.nama)}`}
-                          className="text-sm text-orange-600 hover:text-orange-800 font-medium"
+                          className="text-xs sm:text-sm text-orange-600 hover:text-orange-800 font-medium flex-shrink-0 self-start sm:self-auto"
                         >
                           Lihat
                         </Link>
@@ -209,9 +209,9 @@ export default function AdminPpdbDashboard({
 
           <div className="lg:col-span-1">
             {/* Pendaftar Terbaru */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-900">Pendaftar Terbaru</h2>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6 sm:mb-8">
+              <div className="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900">Pendaftar Terbaru</h2>
               </div>
 
               <div className="divide-y divide-gray-200">
@@ -222,12 +222,12 @@ export default function AdminPpdbDashboard({
                   </div>
                 ) : (
                   recent.map((app, index) => (
-                    <div key={index} className="p-4 hover:bg-gray-50">
+                    <div key={index} className="p-3 sm:p-4 hover:bg-gray-50">
                       <Link href={route('admin.ppdb.show', app.id)}>
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h3 className="text-gray-900 font-semibold text-base">{app.nama_lengkap}</h3>
-                            <p className="text-gray-500 text-sm">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-gray-900 font-semibold text-sm sm:text-base truncate">{app.nama_lengkap}</h3>
+                            <p className="text-gray-500 text-xs sm:text-sm truncate">
                               {app.registration_number} • {app.jurusan_1}
                             </p>
                             <div className="flex items-center mt-1">
@@ -250,10 +250,10 @@ export default function AdminPpdbDashboard({
                 )}
               </div>
 
-              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+              <div className="px-4 py-3 sm:px-6 sm:py-4 bg-gray-50 border-t border-gray-200">
                 <Link
                   href={route('admin.ppdb.index')}
-                  className="text-sm text-orange-600 hover:text-orange-800 font-medium"
+                  className="text-xs sm:text-sm text-orange-600 hover:text-orange-800 font-medium"
                 >
                   Lihat semua pendaftar
                 </Link>
@@ -262,61 +262,61 @@ export default function AdminPpdbDashboard({
 
             {/* Quick Links */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-900">Aksi Cepat</h2>
+              <div className="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900">Aksi Cepat</h2>
               </div>
 
-              <div className="p-6">
-                <div className="space-y-3">
+              <div className="p-4 sm:p-6">
+                <div className="space-y-2 sm:space-y-3">
                   <Link
                     href={route('admin.ppdb.index')}
-                    className="flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 group transition-colors"
+                    className="flex items-center p-2.5 sm:p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 group transition-colors"
                   >
-                    <div className="w-10 h-10 rounded-lg bg-indigo-50 group-hover:bg-indigo-100 flex items-center justify-center mr-3 transition-colors">
-                      <Users className="h-5 w-5 text-indigo-500" />
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-indigo-50 group-hover:bg-indigo-100 flex items-center justify-center mr-2.5 sm:mr-3 flex-shrink-0 transition-colors">
+                      <Users className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-500" />
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-gray-900 text-sm font-medium">Lihat Semua Pendaftar</h3>
-                      <p className="text-gray-500 text-xs">Kelola dan lihat semua data pendaftar PPDB</p>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-gray-900 text-xs sm:text-sm font-medium">Lihat Semua Pendaftar</h3>
+                      <p className="text-gray-500 text-[10px] sm:text-xs hidden sm:block">Kelola dan lihat semua data pendaftar SPMB</p>
                     </div>
                   </Link>
 
                   <Link
                     href={route('admin.ppdb.export')}
-                    className="flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 group transition-colors"
+                    className="flex items-center p-2.5 sm:p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 group transition-colors"
                   >
-                    <div className="w-10 h-10 rounded-lg bg-green-50 group-hover:bg-green-100 flex items-center justify-center mr-3 transition-colors">
-                      <Download className="h-5 w-5 text-green-500" />
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-green-50 group-hover:bg-green-100 flex items-center justify-center mr-2.5 sm:mr-3 flex-shrink-0 transition-colors">
+                      <Download className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-gray-900 text-sm font-medium">Export Data Pendaftar</h3>
-                      <p className="text-gray-500 text-xs">Unduh data pendaftar dalam format Excel</p>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-gray-900 text-xs sm:text-sm font-medium">Export Data Pendaftar</h3>
+                      <p className="text-gray-500 text-[10px] sm:text-xs hidden sm:block">Unduh data pendaftar dalam format Excel</p>
                     </div>
                   </Link>
 
                   <Link
                     href={`${route('admin.ppdb.index')}?status=diterima`}
-                    className="flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 group transition-colors"
+                    className="flex items-center p-2.5 sm:p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 group transition-colors"
                   >
-                    <div className="w-10 h-10 rounded-lg bg-green-50 group-hover:bg-green-100 flex items-center justify-center mr-3 transition-colors">
-                      <CheckCircle className="h-5 w-5 text-green-500" />
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-green-50 group-hover:bg-green-100 flex items-center justify-center mr-2.5 sm:mr-3 flex-shrink-0 transition-colors">
+                      <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-gray-900 text-sm font-medium">Pendaftar Diterima</h3>
-                      <p className="text-gray-500 text-xs">Lihat pendaftar yang sudah diterima</p>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-gray-900 text-xs sm:text-sm font-medium">Pendaftar Diterima</h3>
+                      <p className="text-gray-500 text-[10px] sm:text-xs hidden sm:block">Lihat pendaftar yang sudah diterima</p>
                     </div>
                   </Link>
 
                   <Link
                     href={`${route('admin.ppdb.index')}?status=menunggu`}
-                    className="flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 group transition-colors"
+                    className="flex items-center p-2.5 sm:p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 group transition-colors"
                   >
-                    <div className="w-10 h-10 rounded-lg bg-amber-50 group-hover:bg-amber-100 flex items-center justify-center mr-3 transition-colors">
-                      <Clock className="h-5 w-5 text-amber-500" />
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-amber-50 group-hover:bg-amber-100 flex items-center justify-center mr-2.5 sm:mr-3 flex-shrink-0 transition-colors">
+                      <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500" />
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-gray-900 text-sm font-medium">Pendaftar Menunggu</h3>
-                      <p className="text-gray-500 text-xs">Lihat pendaftar yang menunggu verifikasi</p>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-gray-900 text-xs sm:text-sm font-medium">Pendaftar Menunggu</h3>
+                      <p className="text-gray-500 text-[10px] sm:text-xs hidden sm:block">Lihat pendaftar yang menunggu verifikasi</p>
                     </div>
                   </Link>
                 </div>
@@ -431,17 +431,17 @@ const StatusCard = ({ title, count, color, icon, route }) => {
   const config = colorConfig[color] || colorConfig['blue'];
 
   return (
-    <div className={`${config.bg} ${config.hover} rounded-xl border ${config.border} p-5 transition-all duration-300 hover:shadow-md`}>
-      <div className="flex items-start justify-between mb-4">
-        <div className={`w-12 h-12 rounded-xl ${config.iconBg} flex items-center justify-center`}>
+    <div className={`${config.bg} ${config.hover} rounded-xl border ${config.border} p-3 sm:p-5 transition-all duration-300 hover:shadow-md`}>
+      <div className="flex items-start justify-between mb-3 sm:mb-4">
+        <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${config.iconBg} flex items-center justify-center`}>
           <div className={config.iconColor}>
             {icon}
           </div>
         </div>
-        <p className={`${config.count} text-4xl font-bold tracking-tight`}>{count}</p>
+        <p className={`${config.count} text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight`}>{count}</p>
       </div>
       <div>
-        <h3 className={`${config.text} font-semibold text-lg mb-1`}>{title}</h3>
+        <h3 className={`${config.text} font-semibold text-sm sm:text-base lg:text-lg mb-1`}>{title}</h3>
         <Link href={route} className={`text-sm font-medium ${config.link} inline-flex items-center group`}>
           Lihat detail
           <svg className="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">

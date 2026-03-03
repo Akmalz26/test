@@ -2,8 +2,8 @@ import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { 
-  CheckCircle, AlertTriangle, Clock, FileText, 
+import {
+  CheckCircle, AlertTriangle, Clock, FileText,
   BookOpen, Book, BookCopy, Calendar, User, School,
   ArrowUpCircle, CheckCircleIcon, XCircle, HelpCircle
 } from 'lucide-react';
@@ -24,7 +24,7 @@ export default function PpdbStatus({ auth, applications = [] }) {
             </div>
             <h2 className="text-2xl font-bold text-center mb-4">Login Diperlukan</h2>
             <p className="text-gray-600 text-center mb-8">
-              Untuk melihat status pendaftaran PPDB, Anda perlu login terlebih dahulu.
+              Untuk melihat status pendaftaran SPMB, Anda perlu login terlebih dahulu.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link href="/login" className="px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300 text-center">
@@ -40,7 +40,7 @@ export default function PpdbStatus({ auth, applications = [] }) {
       </div>
     );
   }
-  
+
   // Jika belum memiliki pendaftaran
   if (!applications || applications.length === 0) {
     return (
@@ -55,10 +55,10 @@ export default function PpdbStatus({ auth, applications = [] }) {
             </div>
             <h2 className="text-2xl font-bold text-center mb-4">Belum Ada Pendaftaran</h2>
             <p className="text-gray-600 text-center mb-8">
-              Anda belum melakukan pendaftaran PPDB. Silahkan daftar terlebih dahulu.
+              Anda belum melakukan pendaftaran SPMB. Silahkan daftar terlebih dahulu.
             </p>
             <div className="flex justify-center">
-              <Link href="/ppdb/pendaftaran" className="px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300">
+              <Link href="/spmb/pendaftaran" className="px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300">
                 Daftar Sekarang
               </Link>
             </div>
@@ -71,7 +71,7 @@ export default function PpdbStatus({ auth, applications = [] }) {
 
   // Tampilkan data pendaftaran
   const application = applications[0]; // Ambil pendaftaran terbaru
-  
+
   const getStatusBadge = (status) => {
     const statusConfig = {
       'Menunggu': {
@@ -100,9 +100,9 @@ export default function PpdbStatus({ auth, applications = [] }) {
         text: 'Cadangan',
       },
     };
-    
+
     const config = statusConfig[status] || statusConfig['Menunggu'];
-    
+
     return (
       <div className={`flex items-center px-3 py-1 rounded-full text-xs font-medium ${config.color}`}>
         {config.icon}
@@ -110,26 +110,26 @@ export default function PpdbStatus({ auth, applications = [] }) {
       </div>
     );
   };
-  
+
   return (
     <>
-      <Head title="Status Pendaftaran PPDB - SMK IT Baitul Aziz" />
-      
+      <Head title="Status Pendaftaran SPMB - SMK IT Baitul Aziz" />
+
       <div className="min-h-screen bg-white text-gray-800">
         <Navbar />
-        
+
         <div className="container mx-auto px-6 py-20">
           <div className="max-w-4xl mx-auto">
             {/* Header */}
             <div className="mb-10 text-center">
               <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                Status Pendaftaran <span className="text-orange-500">PPDB</span>
+                Status Pendaftaran <span className="text-orange-500">SPMB</span>
               </h1>
               <p className="text-gray-600 max-w-xl mx-auto">
-                Berikut adalah informasi status pendaftaran PPDB Anda. Anda dapat melihat detail dan mencetak formulir pendaftaran.
+                Berikut adalah informasi status pendaftaran SPMB Anda. Anda dapat melihat detail dan mencetak formulir pendaftaran.
               </p>
             </div>
-            
+
             {/* Status Card */}
             <div className="bg-white shadow-md rounded-xl border border-gray-200 overflow-hidden mb-8">
               <div className="p-6 border-b border-gray-200">
@@ -139,75 +139,75 @@ export default function PpdbStatus({ auth, applications = [] }) {
                       Nomor Pendaftaran: {application.nomor_pendaftaran}
                     </h2>
                     <p className="text-gray-500 text-sm">
-                      Terdaftar pada {new Date(application.created_at).toLocaleDateString('id-ID', { 
-                        day: 'numeric', 
-                        month: 'long', 
-                        year: 'numeric' 
+                      Terdaftar pada {new Date(application.created_at).toLocaleDateString('id-ID', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
                       })}
                     </p>
                   </div>
-                  
+
                   <div>{getStatusBadge(application.status)}</div>
                 </div>
               </div>
-              
+
               <div className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <h3 className="text-sm font-medium text-gray-500 mb-1">Nama Lengkap</h3>
                     <p className="text-gray-800 font-medium">{application.nama_lengkap}</p>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-sm font-medium text-gray-500 mb-1">NISN</h3>
                     <p className="text-gray-800 font-medium">{application.nisn}</p>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-sm font-medium text-gray-500 mb-1">Tempat, Tanggal Lahir</h3>
                     <p className="text-gray-800 font-medium">
-                      {application.tempat_lahir}, {new Date(application.tanggal_lahir).toLocaleDateString('id-ID', { 
-                        day: 'numeric', 
-                        month: 'long', 
-                        year: 'numeric' 
+                      {application.tempat_lahir}, {new Date(application.tanggal_lahir).toLocaleDateString('id-ID', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
                       })}
                     </p>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-sm font-medium text-gray-500 mb-1">Asal Sekolah</h3>
                     <p className="text-gray-800 font-medium">{application.sekolah_asal}</p>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-sm font-medium text-gray-500 mb-1">Jurusan</h3>
                     <p className="text-gray-800 font-medium">PPLG (Program Pengembangan Perangkat Lunak dan Gim)</p>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-sm font-medium text-gray-500 mb-1">No. Telepon</h3>
                     <p className="text-gray-800 font-medium">{application.telepon_hp || '-'}</p>
                   </div>
                 </div>
-                
+
                 {application.catatan && (
                   <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
                     <h3 className="text-sm font-medium text-gray-800 mb-2">Catatan:</h3>
                     <p className="text-gray-600">{application.catatan}</p>
                   </div>
                 )}
-                
+
                 <div className="mt-6 flex flex-col sm:flex-row gap-4">
-                  <Link 
-                    href={`/ppdb/${application.id}`}
+                  <Link
+                    href={`/spmb/${application.id}`}
                     className="px-4 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg text-gray-700 text-sm font-medium transition-all duration-300 flex items-center justify-center"
                   >
                     <FileText className="h-4 w-4 mr-2" />
                     Lihat Detail
                   </Link>
-                  
-                  <Link 
-                    href={`/ppdb/${application.id}/cetak`}
+
+                  <Link
+                    href={`/spmb/${application.id}/cetak`}
                     className="px-4 py-2 bg-orange-100 hover:bg-orange-200 border border-orange-200 rounded-lg text-orange-600 text-sm font-medium transition-all duration-300 flex items-center justify-center"
                   >
                     <Calendar className="h-4 w-4 mr-2" />
@@ -216,37 +216,37 @@ export default function PpdbStatus({ auth, applications = [] }) {
                 </div>
               </div>
             </div>
-            
+
             {/* Status Timeline */}
             <div className="mt-8 bg-white shadow-md rounded-xl border border-gray-200 overflow-hidden">
               <div className="p-6 border-b border-gray-200">
                 <h2 className="text-xl font-semibold text-gray-800">Status Pendaftaran</h2>
               </div>
-              
+
               <div className="p-6">
                 <div className="space-y-6">
-                  <StatusTimelineItem 
-                    title="Pendaftaran" 
-                    date={new Date(application.created_at).toLocaleDateString('id-ID', { 
-                          day: 'numeric', 
-                          month: 'long', 
-                      year: 'numeric' 
+                  <StatusTimelineItem
+                    title="Pendaftaran"
+                    date={new Date(application.created_at).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric'
                     })}
-                    description="Pendaftaran PPDB Anda telah berhasil disubmit."
+                    description="Pendaftaran SPMB Anda telah berhasil disubmit."
                     status="completed"
                   />
-                  
-                  <StatusTimelineItem 
-                    title="Verifikasi Dokumen" 
+
+                  <StatusTimelineItem
+                    title="Verifikasi Dokumen"
                     date={application.status !== 'Menunggu' ? 'Selesai' : 'Menunggu'}
                     description="Verifikasi dokumen pendaftaran oleh admin."
                     status={application.status !== 'Menunggu' ? 'completed' : 'waiting'}
                   />
-                  
-                  <StatusTimelineItem 
-                    title="Pengumuman" 
+
+                  <StatusTimelineItem
+                    title="Pengumuman"
                     date={application.status === 'Diterima' || application.status === 'Ditolak' || application.status === 'Cadangan' ? 'Selesai' : 'Menunggu'}
-                    description="Pengumuman hasil seleksi PPDB."
+                    description="Pengumuman hasil seleksi SPMB."
                     status={application.status === 'Diterima' || application.status === 'Ditolak' || application.status === 'Cadangan' ? 'completed' : 'waiting'}
                   />
                 </div>
@@ -254,7 +254,7 @@ export default function PpdbStatus({ auth, applications = [] }) {
             </div>
           </div>
         </div>
-        
+
         <Footer />
       </div>
     </>
@@ -265,9 +265,8 @@ const StatusTimelineItem = ({ title, date, description, status }) => {
   return (
     <div className="flex">
       <div className="mr-4">
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-          status === 'completed' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'
-        }`}>
+        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${status === 'completed' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'
+          }`}>
           {status === 'completed' ? (
             <CheckCircle className="h-5 w-5" />
           ) : (
@@ -277,12 +276,10 @@ const StatusTimelineItem = ({ title, date, description, status }) => {
       </div>
       <div className="flex-1">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
-          <h3 className={`font-medium ${
-            status === 'completed' ? 'text-gray-800' : 'text-gray-500'
-          }`}>{title}</h3>
-          <span className={`text-xs ${
-            status === 'completed' ? 'text-green-600' : 'text-gray-500'
-          }`}>{date}</span>
+          <h3 className={`font-medium ${status === 'completed' ? 'text-gray-800' : 'text-gray-500'
+            }`}>{title}</h3>
+          <span className={`text-xs ${status === 'completed' ? 'text-green-600' : 'text-gray-500'
+            }`}>{date}</span>
         </div>
         <p className="text-gray-600 text-sm">{description}</p>
       </div>
@@ -322,9 +319,9 @@ export function StatusBadge({ status }: StatusBadgeProps) {
       text: 'Cadangan'
     }
   };
-  
+
   const config = statusConfig[status] || statusConfig['Menunggu'];
-  
+
   return (
     <div className={`px-3 py-1.5 rounded-full inline-flex items-center ${config.color}`}>
       {config.icon}
@@ -361,9 +358,9 @@ export const getStatusBadge = (status: string) => {
       text: 'Cadangan'
     }
   };
-  
+
   const config = statusConfig[status] || statusConfig['Menunggu'];
-  
+
   return (
     <div className={`px-3 py-1.5 rounded-full inline-flex items-center ${config.color}`}>
       {config.icon}
@@ -379,28 +376,28 @@ interface TimelineProps {
 export function StatusTimeline({ ppdb }: TimelineProps) {
   return (
     <div className="space-y-6">
-      <StatusTimelineItem 
-        title="Pendaftaran" 
-        date={new Date(ppdb.created_at).toLocaleDateString('id-ID', { 
-          day: 'numeric', 
-          month: 'long', 
-          year: 'numeric' 
+      <StatusTimelineItem
+        title="Pendaftaran"
+        date={new Date(ppdb.created_at).toLocaleDateString('id-ID', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
         })}
-        description="Pendaftaran PPDB Anda telah berhasil disubmit."
+        description="Pendaftaran SPMB Anda telah berhasil disubmit."
         status="completed"
       />
-      
-      <StatusTimelineItem 
-        title="Verifikasi Dokumen" 
+
+      <StatusTimelineItem
+        title="Verifikasi Dokumen"
         date={ppdb.status !== 'Menunggu' ? 'Selesai' : 'Menunggu'}
         description="Verifikasi dokumen pendaftaran oleh admin."
         status={ppdb.status !== 'Menunggu' ? 'completed' : 'waiting'}
       />
-      
-      <StatusTimelineItem 
-        title="Pengumuman" 
+
+      <StatusTimelineItem
+        title="Pengumuman"
         date={ppdb.status === 'Diterima' || ppdb.status === 'Ditolak' || ppdb.status === 'Cadangan' ? 'Selesai' : 'Menunggu'}
-        description="Pengumuman hasil seleksi PPDB."
+        description="Pengumuman hasil seleksi SPMB."
         status={ppdb.status === 'Diterima' || ppdb.status === 'Ditolak' || ppdb.status === 'Cadangan' ? 'completed' : 'waiting'}
       />
     </div>

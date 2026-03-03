@@ -85,14 +85,14 @@ export default function Index({ extracurriculars }: IndexProps) {
       <div className="container px-6 mx-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between py-4 mb-6">
           <div>
-            <h1 className="text-2xl font-semibold text-white">Ekstrakurikuler</h1>
-            <p className="mt-1 text-sm text-white">
+            <h1 className="text-2xl font-semibold text-gray-800">Ekstrakurikuler</h1>
+            <p className="mt-1 text-sm text-gray-600">
               Kelola daftar ekstrakurikuler yang tersedia di sekolah
             </p>
           </div>
           <Link
             href={route('admin.extracurriculars.create')}
-            className="mt-4 md:mt-0 inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md font-semibold text-xs text-white uppercase tracking-widest transition ease-in-out duration-150"
+            className="mt-4 md:mt-0 inline-flex items-center px-4 py-2 bg-orange-600 hover:bg-orange-700 rounded-md font-semibold text-xs text-white uppercase tracking-widest transition ease-in-out duration-150"
           >
             <Plus className="w-4 h-4 mr-2" />
             Tambah Ekstrakurikuler

@@ -109,6 +109,12 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.87 0 0);
+
+    /* Liquid Gradient Colors */
+    --liquid-bg-1: #fdfbf7;
+    --liquid-blob-1: #ffedd5; /* orange-100 */
+    --liquid-blob-2: #e0e7ff; /* indigo-100 */
+    --liquid-blob-3: #fce7f3; /* pink-100 */
 }
 
 /* Removed dark theme */
@@ -119,7 +125,14 @@
     }
 
     body {
-        @apply bg-background text-foreground;
+        @apply bg-background text-foreground relative overflow-x-hidden;
+        background-color: var(--liquid-bg-1);
+        background-image: 
+            radial-gradient(at 0% 0%, var(--liquid-blob-1) 0px, transparent 50%),
+            radial-gradient(at 100% 0%, var(--liquid-blob-2) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, var(--liquid-blob-3) 0px, transparent 50%),
+            radial-gradient(at 0% 100%, var(--liquid-blob-1) 0px, transparent 50%);
+        background-attachment: fixed;
     }
     
     /* Ensure all inputs have black text */

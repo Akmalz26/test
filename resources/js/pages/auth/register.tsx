@@ -1,6 +1,6 @@
 import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { Eye, EyeOff, LoaderCircle } from 'lucide-react';
+import { FormEventHandler, useState } from 'react';
 
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
@@ -17,6 +17,9 @@ type RegisterForm = {
 };
 
 export default function Register() {
+    const [showPassword, setShowPassword] = useState(false);
+    const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false);
+
     const { data, setData, post, processing, errors, reset } = useForm<Required<RegisterForm>>({
         name: '',
         email: '',
@@ -34,14 +37,14 @@ export default function Register() {
     return (
         <div className="min-h-screen bg-black text-white flex items-center justify-center px-4 py-12">
             <Head title="Registrasi" />
-            
+
             <div className="w-full max-w-md bg-zinc-900/70 rounded-xl border border-zinc-800 shadow-2xl p-8">
                 <div className="flex flex-col items-center mb-8">
                     <img src="/assets/images/logo.png" alt="SMK IT Baitul Aziz" className="h-28 w-auto mb-4" />
                     <h1 className="text-2xl font-bold">Daftar <span className="text-orange-500">Akun</span></h1>
                     <p className="text-zinc-400 text-sm mt-2 text-center">Lengkapi data berikut untuk membuat akun baru dan melakukan pendaftaran PPDB</p>
                 </div>
-                
+
                 <form className="flex flex-col gap-6" onSubmit={submit}>
                     <div className="grid gap-6">
                         <div className="grid gap-2">
@@ -81,42 +84,62 @@ export default function Register() {
 
                         <div className="grid gap-2">
                             <Label htmlFor="password" className="text-zinc-300">Password</Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                required
-                                tabIndex={3}
-                                autoComplete="new-password"
-                                value={data.password}
-                                onChange={(e) => setData('password', e.target.value)}
-                                disabled={processing}
-                                placeholder="Password"
-                                className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-orange-500 focus:ring-orange-500"
-                            />
+                            <div className="relative">
+                                <Input
+                                    id="password"
+                                    type={showPassword ? "text" : "password"}
+                                    required
+                                    tabIndex={3}
+                                    autoComplete="new-password"
+                                    value={data.password}
+                                    onChange={(e) => setData('password', e.target.value)}
+                                    disabled={processing}
+                                    placeholder="Password"
+                                    className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-orange-500 focus:ring-orange-500 pr-10"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-200 transition-colors"
+                                    tabIndex={-1}
+                                >
+                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </button>
+                            </div>
                             <InputError message={errors.password} />
                         </div>
 
                         <div className="grid gap-2">
                             <Label htmlFor="password_confirmation" className="text-zinc-300">Konfirmasi Password</Label>
-                            <Input
-                                id="password_confirmation"
-                                type="password"
-                                required
-                                tabIndex={4}
-                                autoComplete="new-password"
-                                value={data.password_confirmation}
-                                onChange={(e) => setData('password_confirmation', e.target.value)}
-                                disabled={processing}
-                                placeholder="Konfirmasi password"
-                                className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-orange-500 focus:ring-orange-500"
-                            />
+                            <div className="relative">
+                                <Input
+                                    id="password_confirmation"
+                                    type={showPasswordConfirmation ? "text" : "password"}
+                                    required
+                                    tabIndex={4}
+                                    autoComplete="new-password"
+                                    value={data.password_confirmation}
+                                    onChange={(e) => setData('password_confirmation', e.target.value)}
+                                    disabled={processing}
+                                    placeholder="Konfirmasi password"
+                                    className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-orange-500 focus:ring-orange-500 pr-10"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPasswordConfirmation(!showPasswordConfirmation)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-200 transition-colors"
+                                    tabIndex={-1}
+                                >
+                                    {showPasswordConfirmation ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </button>
+                            </div>
                             <InputError message={errors.password_confirmation} />
                         </div>
 
-                        <Button 
-                            type="submit" 
-                            className="mt-2 w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white" 
-                            tabIndex={5} 
+                        <Button
+                            type="submit"
+                            className="mt-2 w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white"
+                            tabIndex={5}
                             disabled={processing}
                         >
                             {processing && <LoaderCircle className="h-4 w-4 animate-spin mr-2" />}

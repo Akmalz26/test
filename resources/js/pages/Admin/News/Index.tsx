@@ -77,10 +77,10 @@ const Index: React.FC<Props> = ({ news }) => {
 
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-white">Manajemen Berita</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Manajemen Berita</h1>
           <Link
             href="/admin/news/create"
-            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg inline-flex items-center transition-colors duration-300"
+            className="bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded-lg inline-flex items-center transition-colors duration-300"
           >
             <Plus className="h-5 w-5 mr-2" />
             Tambah Berita
@@ -125,16 +125,16 @@ const Index: React.FC<Props> = ({ news }) => {
         <div className="bg-white rounded-lg shadow-md">
           {filteredNews.length > 0 ? (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
+              <table className="min-w-full divide-y divide-gray-200 table-fixed">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gambar</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Judul</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unggulan</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Penulis</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                    <th className="w-20 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gambar</th>
+                    <th className="w-64 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Judul</th>
+                    <th className="w-32 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
+                    <th className="w-24 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unggulan</th>
+                    <th className="w-40 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Penulis</th>
+                    <th className="w-40 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                    <th className="w-32 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -160,11 +160,13 @@ const Index: React.FC<Props> = ({ news }) => {
                           />
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{item.title}</div>
-                        {item.summary && (
-                          <div className="text-sm text-gray-500 truncate max-w-xs">{item.summary}</div>
-                        )}
+                      <td className="px-6 py-4">
+                        <div className="max-w-xs">
+                          <div className="text-sm font-medium text-gray-900 truncate">{item.title}</div>
+                          {item.summary && (
+                            <div className="text-sm text-gray-500 truncate">{item.summary}</div>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {item.category ? (
@@ -238,7 +240,7 @@ const Index: React.FC<Props> = ({ news }) => {
               <div className="mt-6">
                 <Link
                   href="/admin/news/create"
-                  className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                  className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-orange-500 hover:bg-orange-600"
                 >
                   <Plus className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
                   Tambah Berita

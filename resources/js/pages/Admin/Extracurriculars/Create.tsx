@@ -58,11 +58,11 @@ export default function Create({ }: CreateProps) {
           <div className="flex items-center">
             <Link
               href={route('admin.extracurriculars.index')}
-              className="inline-flex items-center mr-4 text-white hover:text-gray-900"
+              className="inline-flex items-center mr-4 text-gray-800 hover:text-gray-900"
             >
               <ArrowLeft className="w-5 h-5" />
             </Link>
-            <h1 className="text-2xl font-semibold text-white">Tambah Ekstrakurikuler Baru</h1>
+            <h1 className="text-2xl font-semibold text-gray-800">Tambah Ekstrakurikuler Baru</h1>
           </div>
         </div>
 

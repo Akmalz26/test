@@ -18,7 +18,7 @@ class AdminUserSeeder extends Seeder
         User::create([
             'name' => 'Admin SMK IT Baitul Aziz',
             'email' => 'admin@smkitbaitulaziz.sch.id',
-            'password' => Hash::make('adminsmkitba123'),
+            'password' => Hash::make('smkitbaitulaziz2026'),
             'role' => 'admin',
             'email_verified_at' => now(),
         ]);
@@ -26,8 +26,8 @@ class AdminUserSeeder extends Seeder
         // Buat akun operator
         User::create([
             'name' => 'Operator PPDB',
-            'email' => 'ppdb@smkitbaitulaziz.sch.id',
-            'password' => Hash::make('ppdbsmkitba123'),
+            'email' => 'spmb@smkitbaitulaziz.sch.id',
+            'password' => Hash::make('spmbsmkitba2026'),
             'role' => 'admin',
             'email_verified_at' => now(),
         ]);
@@ -35,9 +35,9 @@ class AdminUserSeeder extends Seeder
         // Output informasi
         $this->command->info('Akun admin berhasil dibuat!');
         $this->command->line('Email: admin@smkitbaitulaziz.sch.id');
-        $this->command->line('Password: adminsmkitba123');
+        $this->command->line('Password: smkitbaitulaziz2026');
         $this->command->line('');
-        $this->command->line('Email: ppdb@smkitbaitulaziz.sch.id');
-        $this->command->line('Password: ppdbsmkitba123');
+        $this->command->line('Email: spmb@smkitbaitulaziz.sch.id');
+        $this->command->line('Password: spmbsmkitba2026');
     }
 }

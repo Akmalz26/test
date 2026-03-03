@@ -83,15 +83,15 @@ export default function AdminPpdbIndex({ auth, applications, filters = {} }) {
 
   return (
     <AdminLayout>
-      <Head title="Kelola Pendaftaran PPDB - Admin Dashboard" />
+      <Head title="Kelola Pendaftaran SPMB - Admin Dashboard" />
 
       <div className="px-6 py-8">
         <div className="mb-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white">
-              Kelola Pendaftaran PPDB
+            <h1 className="text-2xl font-bold text-gray-900">
+              Kelola Pendaftaran SPMB
             </h1>
-            <p className="mt-1 text-white">
+            <p className="mt-1 text-gray-600">
               Kelola dan lihat status pendaftaran peserta didik baru.
             </p>
           </div>
@@ -338,10 +338,10 @@ export default function AdminPpdbIndex({ auth, applications, filters = {} }) {
                       key={i}
                       href={link.url || '#'}
                       className={`px-3 py-1 rounded-md text-sm ${link.active
-                          ? 'bg-orange-500 text-white'
-                          : link.url
-                            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            : 'bg-gray-50 text-gray-400 cursor-default'
+                        ? 'bg-orange-500 text-white'
+                        : link.url
+                          ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          : 'bg-gray-50 text-gray-400 cursor-default'
                         }`}
                       preserveScroll
                     >

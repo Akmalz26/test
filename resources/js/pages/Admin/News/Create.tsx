@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeft, Upload, X } from 'lucide-react';
+import { ArrowLeft, Upload, X, Images, Plus } from 'lucide-react';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Editor } from '@tinymce/tinymce-react';
 
@@ -19,49 +19,43 @@ const Create: React.FC = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const editorRef = useRef<any>(null);
 
+    // Gallery state
+    const [galleryPhotos, setGalleryPhotos] = useState<File[]>([]);
+    const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
+    const [galleryCaptions, setGalleryCaptions] = useState<string[]>([]);
+    const galleryInputRef = useRef<HTMLInputElement>(null);
+
     // Helper untuk membuat slug otomatis
     const generateSlug = (text: string) => {
         return text
             .toString()
             .toLowerCase()
             .trim()
-            .replace(/\s+/g, '-')     // Ganti spasi dengan -
-            .replace(/[^\w\-]+/g, '') // Hapus karakter non-word
-            .replace(/\-\-+/g, '-')   // Ganti multiple - dengan single -
-            .replace(/^-+/, '')       // Hapus - di awal
-            .replace(/-+$/, '');      // Hapus - di akhir
+            .replace(/\s+/g, '-')
+            .replace(/[^\w\-]+/g, '')
+            .replace(/\-\-+/g, '-')
+            .replace(/^-+/, '')
+            .replace(/-+$/, '');
     };
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setTitle(value);
-
-        // Auto generate slug jika user belum mengetik slug secara manual (atau kita bisa overwrite selalu)
-        // Di sini saya buat overwrite selalu untuk kemudahan, kecuali user mengedit slug terpisah
-        // Tapi untuk UI terbaik, biasanya slug mengikuti title selama slug belum disentuh.
-        // Untuk sederhananya, kita update slug setiap title berubah.
         setSlug(generateSlug(value));
     };
 
-    // Daftar kategori yang tersedia
     const availableCategories = ['Akademik', 'Kegiatan Sekolah', 'Prestasi', 'Pengumuman', 'Artikel', 'Lainnya'];
 
-    // Menangani perubahan file gambar
-
-    // Menangani perubahan file gambar
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             setImage(file);
-
-            // Membuat URL preview
             const reader = new FileReader();
             reader.onloadend = () => {
                 setImagePreview(reader.result as string);
             };
             reader.readAsDataURL(file);
 
-            // Hapus error jika ada
             if (errors.image) {
                 const newErrors = { ...errors };
                 delete newErrors.image;
@@ -70,7 +64,6 @@ const Create: React.FC = () => {
         }
     };
 
-    // Menghapus gambar yang sudah dipilih
     const removeImage = () => {
         setImage(null);
         setImagePreview(null);
@@ -79,7 +72,50 @@ const Create: React.FC = () => {
         }
     };
 
-    // Validasi form sebelum submit
+    // Gallery handlers
+    const handleGalleryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (!files) return;
+
+        const newFiles = Array.from(files);
+        const newPreviews: string[] = [];
+        const newCaptions: string[] = [];
+
+        let loaded = 0;
+        newFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                newPreviews[index] = reader.result as string;
+                loaded++;
+                if (loaded === newFiles.length) {
+                    setGalleryPhotos(prev => [...prev, ...newFiles]);
+                    setGalleryPreviews(prev => [...prev, ...newPreviews]);
+                    setGalleryCaptions(prev => [...prev, ...newFiles.map(() => '')]);
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Reset input
+        if (galleryInputRef.current) {
+            galleryInputRef.current.value = '';
+        }
+    };
+
+    const removeGalleryPhoto = (index: number) => {
+        setGalleryPhotos(prev => prev.filter((_, i) => i !== index));
+        setGalleryPreviews(prev => prev.filter((_, i) => i !== index));
+        setGalleryCaptions(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const updateGalleryCaption = (index: number, caption: string) => {
+        setGalleryCaptions(prev => {
+            const updated = [...prev];
+            updated[index] = caption;
+            return updated;
+        });
+    };
+
     const validateForm = () => {
         const newErrors: Record<string, string> = {};
 
@@ -94,7 +130,7 @@ const Create: React.FC = () => {
         if (!image) {
             newErrors.image = 'Gambar berita wajib diunggah';
         } else {
-            const maxSize = 2 * 1024 * 1024; // 2MB
+            const maxSize = 2 * 1024 * 1024;
             if (image.size > maxSize) {
                 newErrors.image = 'Ukuran gambar maksimal 2MB';
             }
@@ -109,15 +145,27 @@ const Create: React.FC = () => {
             newErrors.slug = 'Slug wajib diisi';
         }
 
+        // Validate gallery photos
+        const maxGallerySize = 5 * 1024 * 1024;
+        const allowedGalleryTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+        for (let i = 0; i < galleryPhotos.length; i++) {
+            if (galleryPhotos[i].size > maxGallerySize) {
+                newErrors.gallery = `Foto galeri ke-${i + 1} melebihi ukuran maksimal 5MB`;
+                break;
+            }
+            if (!allowedGalleryTypes.includes(galleryPhotos[i].type)) {
+                newErrors.gallery = `Foto galeri ke-${i + 1} format tidak didukung`;
+                break;
+            }
+        }
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
-    // Menangani submit form
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        // Pastikan content dari editor disimpan
         if (editorRef.current) {
             setContent(editorRef.current.getContent());
         }
@@ -140,9 +188,14 @@ const Create: React.FC = () => {
         }
         formData.append('slug', slug);
 
+        // Append gallery photos
+        galleryPhotos.forEach((photo, index) => {
+            formData.append(`gallery_photos[${index}]`, photo);
+            formData.append(`gallery_captions[${index}]`, galleryCaptions[index] || '');
+        });
+
         router.post('/admin/news', formData, {
             onSuccess: () => {
-                // Navigasi ke halaman daftar berita jika berhasil
                 router.visit('/admin/news');
             },
             onError: (errors) => {
@@ -163,12 +216,12 @@ const Create: React.FC = () => {
                 <div className="mb-6">
                     <Link
                         href="/admin/news"
-                        className="text-white hover:text-blue-800 inline-flex items-center"
+                        className="text-gray-800 hover:text-blue-800 inline-flex items-center"
                     >
                         <ArrowLeft className="h-4 w-4 mr-1" />
                         Kembali ke Daftar Berita
                     </Link>
-                    <h1 className="text-2xl font-bold text-white mt-2">Tambah Berita Baru</h1>
+                    <h1 className="text-2xl font-bold text-gray-800 mt-2">Tambah Berita Baru</h1>
                 </div>
 
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
@@ -261,6 +314,79 @@ const Create: React.FC = () => {
                                         <p className="mt-2 text-sm text-red-600 flex items-center">
                                             <span className="w-1 h-1 bg-red-600 rounded-full mr-2"></span>
                                             {errors.content}
+                                        </p>
+                                    )}
+                                </div>
+
+                                {/* Galeri Foto */}
+                                <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className="flex items-center gap-2">
+                                            <Images className="h-5 w-5 text-blue-500" />
+                                            <h3 className="font-semibold text-gray-900">Galeri Foto</h3>
+                                        </div>
+                                        <span className="text-xs text-gray-400">{galleryPhotos.length} foto</span>
+                                    </div>
+                                    <p className="text-sm text-gray-500 mb-4">
+                                        Tambahkan beberapa foto untuk galeri berita ini. Foto akan ditampilkan sebagai album di halaman galeri.
+                                    </p>
+
+                                    {/* Gallery Preview Grid */}
+                                    {galleryPreviews.length > 0 && (
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
+                                            {galleryPreviews.map((preview, index) => (
+                                                <div key={index} className="relative group">
+                                                    <div className="relative rounded-xl overflow-hidden shadow-sm ring-1 ring-gray-200">
+                                                        <img
+                                                            src={preview}
+                                                            alt={`Gallery ${index + 1}`}
+                                                            className="w-full h-32 object-cover"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeGalleryPhoto(index)}
+                                                            className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1 rounded-lg shadow-lg transition-all opacity-0 group-hover:opacity-100"
+                                                        >
+                                                            <X className="h-3.5 w-3.5" />
+                                                        </button>
+                                                    </div>
+                                                    <input
+                                                        type="text"
+                                                        value={galleryCaptions[index] || ''}
+                                                        onChange={(e) => updateGalleryCaption(index, e.target.value)}
+                                                        className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-xs py-1.5 px-2"
+                                                        placeholder="Keterangan foto..."
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {/* Add Photos Button */}
+                                    <div
+                                        onClick={() => galleryInputRef.current?.click()}
+                                        className="border-2 border-dashed border-gray-300 rounded-xl p-6 flex justify-center items-center flex-col cursor-pointer hover:border-blue-500 hover:bg-blue-50/50 transition-all duration-300 group bg-white"
+                                    >
+                                        <div className="p-2.5 rounded-full bg-blue-50 group-hover:bg-blue-100 transition-colors mb-2">
+                                            <Plus className="h-5 w-5 text-blue-500" />
+                                        </div>
+                                        <p className="text-sm font-medium text-gray-600 group-hover:text-blue-600">
+                                            Tambah Foto Galeri
+                                        </p>
+                                        <p className="text-xs text-gray-400 mt-1">Max 5MB per foto (JPG/PNG/WebP)</p>
+                                        <input
+                                            type="file"
+                                            ref={galleryInputRef}
+                                            className="hidden"
+                                            onChange={handleGalleryChange}
+                                            accept="image/jpeg,image/png,image/jpg,image/webp"
+                                            multiple
+                                        />
+                                    </div>
+                                    {errors.gallery && (
+                                        <p className="mt-2 text-sm text-red-600 flex items-center">
+                                            <span className="w-1 h-1 bg-red-600 rounded-full mr-2"></span>
+                                            {errors.gallery}
                                         </p>
                                     )}
                                 </div>

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class News extends Model
 {
@@ -53,7 +54,7 @@ class News extends Model
     {
         return $this->belongsTo(User::class);
     }
-    
+
     /**
      * Alias untuk relationship user.
      * Digunakan untuk konsistensi dengan interface di frontend yang menggunakan author.
@@ -61,5 +62,13 @@ class News extends Model
     public function author(): BelongsTo
     {
         return $this->user();
+    }
+
+    /**
+     * Get the gallery photos for this news.
+     */
+    public function galleryPhotos(): HasMany
+    {
+        return $this->hasMany(GalleryPhoto::class)->orderBy('sort_order');
     }
 }

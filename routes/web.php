@@ -33,6 +33,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/profil-sekolah', [HomeController::class, 'profile'])->name('profile');
 Route::get('/program-keahlian', [HomeController::class, 'programKeahlian'])->name('program-keahlian');
 Route::get('/gallery', [HomeController::class, 'gallery'])->name('gallery');
+Route::get('/gallery/{slug}', [HomeController::class, 'galleryDetail'])->name('gallery.detail');
 Route::get('/berita', [HomeController::class, 'news'])->name('news');
 Route::get('/berita/{slug}', [HomeController::class, 'newsDetail'])->name('news.detail');
 Route::get('/kontak', [HomeController::class, 'contact'])->name('contact');
@@ -44,15 +45,17 @@ Route::get('/ekstrakurikuler/{slug}', [ExtracurricularController::class, 'show']
 // Struktur Organisasi routes
 Route::get('/struktur-organisasi', [StrukturController::class, 'index'])->name('struktur.index');
 
-// PPDB routes
-Route::get('/ppdb', [PpdbController::class, 'index'])->name('ppdb.index');
-Route::get('/ppdb/pendaftaran', [PpdbController::class, 'create'])->name('ppdb.create');
-Route::post('/ppdb/pendaftaran', [PpdbController::class, 'store'])->name('ppdb.store');
-Route::get('/ppdb/status', [PpdbController::class, 'status'])->name('ppdb.status');
-Route::get('/ppdb/{ppdb}', [PpdbController::class, 'show'])->name('ppdb.show');
-Route::get('/ppdb/{ppdb}/cetak', [PpdbController::class, 'print'])->name('ppdb.print');
-Route::get('/ppdb/{ppdb}/edit', [PpdbController::class, 'edit'])->name('ppdb.edit');
-Route::post('/ppdb/pendaftaran/{ppdb}/update', [PpdbController::class, 'update'])->name('ppdb.update');
+// SPMB public routes
+Route::get('/spmb', [PpdbController::class, 'index'])->name('ppdb.index');
+Route::get('/spmb/brochure/download', [PpdbController::class, 'downloadBrochure'])->name('ppdb.brochure.download');
+Route::get('/spmb/pendaftaran', [PpdbController::class, 'create'])->name('ppdb.create');
+Route::post('/spmb/pendaftaran', [PpdbController::class, 'store'])->name('ppdb.store');
+Route::get('/spmb/status', [PpdbController::class, 'status'])->name('ppdb.status');
+Route::get('/spmb/{ppdb}', [PpdbController::class, 'show'])->name('ppdb.show');
+Route::get('/spmb/{ppdb}/cetak', [PpdbController::class, 'print'])->name('ppdb.print');
+Route::get('/spmb/{ppdb}/edit', [PpdbController::class, 'edit'])->name('ppdb.edit');
+Route::post('/spmb/pendaftaran/{ppdb}/update', [PpdbController::class, 'update'])->name('ppdb.update');
+
 
 // Authentication routes
 Route::middleware('auth')->group(function () {
@@ -64,7 +67,7 @@ Route::middleware('auth')->group(function () {
 // Admin routes
 Route::prefix('admin')->middleware(['auth', AdminMiddleware::class])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
+
     // Gallery Routes
     Route::resource('gallery', GalleryController::class)->names([
         'index' => 'admin.gallery.index',
@@ -75,7 +78,7 @@ Route::prefix('admin')->middleware(['auth', AdminMiddleware::class])->group(func
         'update' => 'admin.gallery.update',
         'destroy' => 'admin.gallery.destroy',
     ]);
-    
+
     // News Routes
     Route::resource('news', NewsController::class)->names([
         'index' => 'admin.news.index',
@@ -97,18 +100,34 @@ Route::prefix('admin')->middleware(['auth', AdminMiddleware::class])->group(func
         'update' => 'admin.extracurriculars.update',
         'destroy' => 'admin.extracurriculars.destroy',
     ]);
-    
-    // PPDB management
-    Route::get('/ppdb', [PpdbAdminController::class, 'index'])->name('admin.ppdb.index');
-    Route::get('/ppdb/dashboard', [PpdbAdminController::class, 'dashboard'])->name('admin.ppdb.dashboard');
-    Route::get('/ppdb/settings', [PpdbAdminController::class, 'settings'])->name('admin.ppdb.settings');
-    Route::put('/ppdb/settings', [PpdbAdminController::class, 'updateSettings'])->name('admin.ppdb.settings.update');
-    Route::get('/ppdb/export', [PpdbAdminController::class, 'export'])->name('admin.ppdb.export');
-    Route::get('/ppdb/{ppdb}', [PpdbAdminController::class, 'show'])->name('admin.ppdb.show');
-    Route::put('/ppdb/{ppdb}/status', [PpdbAdminController::class, 'updateStatus'])->name('admin.ppdb.update-status');
-    Route::get('/ppdb/{ppdb}/cetak', [PpdbAdminController::class, 'print'])->name('admin.ppdb.print');
-    Route::delete('/ppdb/{ppdb}', [PpdbAdminController::class, 'destroy'])->name('admin.ppdb.destroy');
-    
+
+    // SPMB management
+    Route::get('/spmb', [PpdbAdminController::class, 'index'])->name('admin.ppdb.index');
+    Route::get('/spmb/dashboard', [PpdbAdminController::class, 'dashboard'])->name('admin.ppdb.dashboard');
+    Route::get('/spmb/settings', [PpdbAdminController::class, 'settings'])->name('admin.ppdb.settings');
+    Route::put('/spmb/settings', [PpdbAdminController::class, 'updateSettings'])->name('admin.ppdb.settings.update');
+    Route::post('/spmb/settings', [PpdbAdminController::class, 'updateSettings']); // For file uploads
+    Route::get('/spmb/export', [PpdbAdminController::class, 'export'])->name('admin.ppdb.export');
+    Route::get('/spmb/{ppdb}', [PpdbAdminController::class, 'show'])->name('admin.ppdb.show');
+    Route::put('/spmb/{ppdb}/status', [PpdbAdminController::class, 'updateStatus'])->name('admin.ppdb.update-status');
+    Route::get('/spmb/{ppdb}/cetak', [PpdbAdminController::class, 'print'])->name('admin.ppdb.print');
+    Route::get('/spmb/{ppdb}/download/{documentType}', [PpdbAdminController::class, 'downloadDocument'])->name('admin.ppdb.download');
+    Route::delete('/spmb/{ppdb}', [PpdbAdminController::class, 'destroy'])->name('admin.ppdb.destroy');
+
+    // SPMB Timeline management
+    Route::resource('/spmb/timelines', \App\Http\Controllers\Admin\PpdbTimelineController::class)->names([
+        'store' => 'admin.ppdb.timelines.store',
+        'update' => 'admin.ppdb.timelines.update',
+        'destroy' => 'admin.ppdb.timelines.destroy',
+    ])->only(['store', 'update', 'destroy']);
+
+    // SPMB Info Cards management
+    Route::resource('/spmb/info-cards', \App\Http\Controllers\Admin\PpdbInfoCardController::class)->names([
+        'store' => 'admin.ppdb.info_cards.store',
+        'update' => 'admin.ppdb.info_cards.update',
+        'destroy' => 'admin.ppdb.info_cards.destroy',
+    ])->only(['store', 'update', 'destroy']);
+
     // User management
     Route::resource('users', UserController::class)->names([
         'index' => 'admin.users.index',
@@ -119,7 +138,7 @@ Route::prefix('admin')->middleware(['auth', AdminMiddleware::class])->group(func
         'update' => 'admin.users.update',
         'destroy' => 'admin.users.destroy',
     ]);
-    
+
     // Teacher management
     Route::resource('teachers', TeacherController::class)->names([
         'index' => 'admin.teachers.index',
@@ -132,4 +151,4 @@ Route::prefix('admin')->middleware(['auth', AdminMiddleware::class])->group(func
     ]);
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

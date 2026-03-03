@@ -3,7 +3,7 @@ import { Head } from '@inertiajs/react';
 
 export default function PpdbPrint({ auth, ppdb }: { auth: any, ppdb: any }) {
   const printRef = useRef(null);
-  
+
   useEffect(() => {
     // Auto print saat halaman dimuat
     if (ppdb) {
@@ -12,7 +12,7 @@ export default function PpdbPrint({ auth, ppdb }: { auth: any, ppdb: any }) {
       }, 500);
     }
   }, [ppdb]);
-  
+
   // Jika tidak ada data pendaftaran
   if (!ppdb) {
     return (
@@ -20,9 +20,9 @@ export default function PpdbPrint({ auth, ppdb }: { auth: any, ppdb: any }) {
         <div className="max-w-lg mx-auto p-8 text-center">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Data Tidak Ditemukan</h2>
           <p className="text-gray-600 mb-8">
-            Data pendaftaran PPDB tidak ditemukan atau Anda tidak memiliki akses.
+            Data pendaftaran SPMB tidak ditemukan atau Anda tidak memiliki akses.
           </p>
-          <button 
+          <button
             onClick={() => window.history.back()}
             className="px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300"
           >
@@ -39,35 +39,35 @@ export default function PpdbPrint({ auth, ppdb }: { auth: any, ppdb: any }) {
 
   return (
     <>
-      <Head title="Cetak Formulir Pendaftaran PPDB - SMK IT Baitul Aziz" />
-      
+      <Head title="Cetak Formulir Pendaftaran SPMB - SMK IT Baitul Aziz" />
+
       <div className="print:p-0 p-8 bg-white text-black min-h-screen font-serif" ref={printRef}>
         {/* Hanya tampilkan tombol kembali saat mode preview (tidak print) */}
         <div className="mb-8 print:hidden">
-          <button 
+          <button
             onClick={() => window.history.back()}
             className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-800 text-sm font-medium transition-all duration-300 mr-4"
           >
             Kembali
           </button>
-          
-          <button 
+
+          <button
             onClick={() => window.print()}
             className="px-4 py-2 bg-orange-500 hover:bg-orange-600 rounded-lg text-white text-sm font-medium transition-all duration-300"
           >
             Cetak Formulir
           </button>
         </div>
-        
+
         <div className="max-w-4xl mx-auto bg-white text-[12px]">
           {/* Header dengan logo dan alamat */}
           <div className="border-b-2 border-black mb-2">
             <div className="text-center pb-2">
               <div className="flex justify-center items-center mb-1">
                 <div className="p-1 mb-5 ml-16">
-                  <img 
-                    src="/assets/images/logo-ba.png" 
-                  alt="Logo SMK IT Baitul Aziz" 
+                  <img
+                    src="/assets/images/logo-ba.png"
+                    alt="Logo SMK IT Baitul Aziz"
                     className="h-24 w-auto"
                   />
                 </div>
@@ -81,22 +81,22 @@ export default function PpdbPrint({ auth, ppdb }: { auth: any, ppdb: any }) {
                   <p className="text-[10px] text-black leading-none mb-0.5">Telp. 022-595 0175 - website : www.smkitbaitulaziz.sch.id - email : smkitbaitulaziz@gmail.com</p>
                 </div>
                 <div className="p-1 mb-5 mr-16">
-                  <img 
-                    src="/assets/images/logo.png" 
-                    alt="Logo SMK" 
+                  <img
+                    src="/assets/images/logo.png"
+                    alt="Logo SMK"
                     className="h-24 w-auto"
-                />
-              </div>
+                  />
+                </div>
               </div>
             </div>
           </div>
-          
+
           {/* Judul Formulir */}
           <div className="text-center mb-3">
             <h2 className="text-base font-bold text-black">FORMULIR PENDAFTARAN</h2>
             <h3 className="text-sm font-bold text-black">CALON SISWA BARU TAHUN PELAJARAN {tahunAkademik}</h3>
           </div>
-          
+
           {/* Form Isian */}
           <div className="mb-3">
             <table className="w-full mb-2 text-[12px]">
@@ -118,13 +118,13 @@ export default function PpdbPrint({ auth, ppdb }: { auth: any, ppdb: any }) {
                 </tr>
               </tbody>
             </table>
-            
+
             <div className="italic text-[10px] mb-2">Diisi dengan menggunakan huruf kapital/cetak</div>
 
             {/* DATA SISWA */}
             <div className="mb-3">
               <h3 className="font-bold mb-1 text-[12px]">A. DATA SISWA</h3>
-              
+
               <table className="w-full text-[12px]">
                 <tbody>
                   <tr>
@@ -177,12 +177,12 @@ export default function PpdbPrint({ auth, ppdb }: { auth: any, ppdb: any }) {
                   </tr>
                 </tbody>
               </table>
-              </div>
-              
+            </div>
+
             {/* DATA SEKOLAH */}
             <div className="mb-3">
               <h3 className="font-bold mb-1 text-[12px]">B. DATA SEKOLAH / PENDIDIKAN TERAKHIR</h3>
-              
+
               <table className="w-full text-[12px]">
                 <tbody>
                   <tr>
@@ -203,11 +203,11 @@ export default function PpdbPrint({ auth, ppdb }: { auth: any, ppdb: any }) {
                 </tbody>
               </table>
             </div>
-            
+
             {/* DATA ORANG TUA */}
             <div className="mb-4">
               <h3 className="font-bold mb-1 text-[12px]">C. DATA ORANG TUA / WALI</h3>
-              
+
               <table className="w-full text-[12px]">
                 <tbody>
                   <tr>
@@ -258,8 +258,8 @@ export default function PpdbPrint({ auth, ppdb }: { auth: any, ppdb: any }) {
                   </tr>
                 </tbody>
               </table>
-              </div>
-              
+            </div>
+
             {/* Tanda Tangan & Foto */}
             <div className="flex justify-between mb-5">
               <div className="w-1/3 text-center text-[12px]">
@@ -270,18 +270,18 @@ export default function PpdbPrint({ auth, ppdb }: { auth: any, ppdb: any }) {
               <div className="border border-black h-[3.5cm] w-[2.5cm] text-center flex items-center justify-center">
                 <div className="text-[10px] text-gray-500">Pas Foto 3x4</div>
               </div>
-              
+
               <div className="w-1/3 text-center text-[12px]">
                 <div className="mb-3">Siswa</div>
                 <div className="mb-16"></div>
                 <div className="font-bold">( {ppdb.nama_lengkap || '.........................'} )</div>
               </div>
             </div>
-            
+
             {/* Syarat Pendaftaran */}
             <div className="mb-1">
               <h3 className="font-bold mb-1 text-center underline text-[12px]">SYARAT PENDAFTARAN</h3>
-              
+
               <div className="flex">
                 <div className="w-1/2 text-[11px]">
                   <ol className="list-decimal ml-5">
@@ -299,15 +299,15 @@ export default function PpdbPrint({ auth, ppdb }: { auth: any, ppdb: any }) {
                     <li>Pas Foto berwarna 3x4 2 Lembar</li>
                     <li>Membayar uang atribut wajib saat daftar ulang</li>
                   </ol>
+                </div>
               </div>
-            </div>
-            
+
               <div className="italic font-bold text-center mt-1 text-[10px]">Persyaratan dimasukan kedalam Map Biru</div>
             </div>
           </div>
         </div>
       </div>
-      
+
       {/* Print styles */}
       <style>{`
         @media print {

@@ -38,7 +38,7 @@ const Show: React.FC<Props> = ({ news }) => {
         <div className="mb-6">
           <Link 
             href="/admin/news" 
-            className="text-blue-600 hover:text-blue-800 inline-flex items-center"
+            className="text-orange-600 hover:text-orange-800 inline-flex items-center"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Kembali ke daftar berita
